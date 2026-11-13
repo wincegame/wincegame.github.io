@@ -5,12 +5,17 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Wince game — free ragdoll sandbox in your browser and in VR</title>
 <link rel="canonical" href="https://wincegame.github.io/">
-<meta name="description" content="Wince is a free ragdoll sandbox game that runs in the browser. Mannequins, knife, machete, hammer, pistol, rifle and shotgun, realistic blood and X-ray. Play on a tablet or in VR on Meta Quest.">
+<meta name="description" content="Wince is a free ragdoll sandbox game you play right in the browser, no download. Mannequins flinch, bleed and run; knife, machete, hammer, pistol, rifle, shotgun and X-ray. Works on tablets, phones, computers and in VR on Meta Quest.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://wincegame.github.io/">
 <meta property="og:site_name" content="Wince">
 <meta property="og:title" content="Wince game — ragdoll sandbox in your browser and VR">
 <meta property="og:description" content="Free ragdoll sandbox in a physics test chamber. Play in the browser or in VR on Meta Quest.">
+<meta property="og:image" content="https://wincegame.github.io/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Mannequins in the tiled Wince test chamber">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <meta name="theme-color" content="#DCE1E6">
 <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#1F252B">
@@ -18,7 +23,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Roboto+Flex:wdth,wght@25..151,100..1000&display=swap" rel="stylesheet">
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"VideoGame","name":"Wince","alternateName":"Wince game","url":"https://wincegame.github.io/","description":"Free ragdoll sandbox game in a physics test chamber: mannequins, knife, machete, hammer, pistol, rifle and shotgun, realistic blood and X-ray. Runs in the browser and in VR on Meta Quest.","genre":["Sandbox","Simulation","Physics"],"gamePlatform":["Web browser","Meta Quest"],"playMode":"SinglePlayer","applicationCategory":"Game","operatingSystem":"Any (web browser)","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}
+{"@context":"https://schema.org","@type":"VideoGame","name":"Wince","alternateName":"Wince game","url":"https://wincegame.github.io/","description":"Free ragdoll sandbox game in a physics test chamber: mannequins, knife, machete, hammer, pistol, rifle and shotgun, realistic blood and X-ray. Runs in the browser and in VR on Meta Quest.","genre":["Sandbox","Simulation","Physics"],"gamePlatform":["Web browser","Android","PC","Meta Quest"],"image":"https://wincegame.github.io/og.jpg","inLanguage":["en","ru","pl"],"playMode":"SinglePlayer","applicationCategory":"Game","operatingSystem":"Any (web browser)","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}
 </script>
 <style>
 :root{--wall:#DCE1E6;--panel:#F1F3F5;--floor:#AEB9C6;--grout:#EEF2F5;--ink:#232A31;--mute:#4F5A65;--stripe:#E8622C;--bg:#E7EBEF;--line:#C4CBD2}
@@ -70,13 +75,17 @@ section+section{margin-top:clamp(44px,6vw,68px)}
 .inside{list-style:none;margin:0;padding:0;max-width:40em}
 .inside li{padding:12px 0 12px 22px;border-top:1px solid var(--line);position:relative}
 .inside li::before{content:"";position:absolute;left:0;top:23px;width:10px;height:3px;background:var(--stripe)}
-.ctrls{display:grid;grid-template-columns:1fr 1fr;gap:clamp(20px,4vw,48px)}
+.ctrls{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:clamp(20px,4vw,44px)}
 .ctrls h3{font-size:21px;font-weight:750;margin:0 0 8px}
 .ctrls p{margin:0 0 10px;max-width:34em}
 .note{border-left:6px solid var(--stripe);background:var(--panel);padding:16px 20px;border-radius:0 8px 8px 0;max-width:40em}
 .note p{margin:0}
 footer{max-width:1100px;margin:0 auto;padding:28px 20px 48px;color:var(--mute);font-size:15px;border-top:1px solid var(--line)}
-@media (max-width:760px){.ctrls{grid-template-columns:1fr}body{font-size:17px}}
+.faq{max-width:40em}
+.faq h3{font-size:19px;font-weight:750;margin:22px 0 4px}
+.faq h3:first-child{margin-top:0}
+.faq p{margin:0}
+@media (max-width:760px){body{font-size:17px}}
 </style>
 </head>
 <body>
@@ -132,6 +141,35 @@ footer{max-width:1100px;margin:0 auto;padding:28px 20px 48px;color:var(--mute);f
     <p lang="en">Open this page in the Quest browser, tap “Play in the browser”, then press VR. The left stick walks, the right one turns. The trigger fires, the grip grabs — even from a distance. A switches weapons, B is slow motion, Y opens the panel on your left wrist: point the beam at a button and pull the trigger. Press the left stick for X-ray.</p>
     <p lang="ru">Открой эту страницу в браузере Quest, нажми «Играть в браузере», потом VR. Левый стик — ходьба, правый — повороты. Курок — выстрел, кнопка хвата — схватить, даже издалека. A — смена оружия, B — замедление, Y — панель на левом запястье: наведи луч на кнопку и нажми курок. Нажми левый стик — рентген.</p>
    </div>
+   <div>
+    <h3><span lang="en">On a computer</span><span lang="ru">На компьютере</span></h3>
+    <p lang="en">Click the game to capture the mouse. WASD or the arrow keys walk, the mouse looks around, the left button fires, the right button grabs.</p>
+    <p lang="ru">Кликни по игре, чтобы захватить мышь. WASD или стрелки — ходьба, мышь — обзор, левая кнопка — выстрел, правая — схватить.</p>
+   </div>
+  </div>
+ </section>
+
+ <section>
+  <h2><span lang="en">Questions and answers</span><span lang="ru">Вопросы и ответы</span></h2>
+  <div class="faq" lang="en">
+   <h3>Is Wince free?</h3>
+   <p>Yes. It is a free browser game: nothing to download or install, and no account.</p>
+   <h3>What is a ragdoll sandbox?</h3>
+   <p>A physics toy with no goals or levels. The bodies go limp and react to every hit, cut and shot the way real bodies would — you set things up and watch the physics play out.</p>
+   <h3>Which devices does it run on?</h3>
+   <p>A modern browser on an Android tablet or phone or on a computer, and Meta Quest in VR through WebXR.</p>
+   <h3>How do I play it in VR?</h3>
+   <p>Open wincegame.github.io in the Meta Quest browser, tap “Play in the browser”, then press VR.</p>
+  </div>
+  <div class="faq" lang="ru">
+   <h3>Wince бесплатный?</h3>
+   <p>Да. Это бесплатная браузерная игра: ничего не нужно скачивать и устанавливать, регистрация не нужна.</p>
+   <h3>Что такое рэгдолл-песочница?</h3>
+   <p>Физическая игрушка без целей и уровней. Тела обмякают и реагируют на каждый удар, порез и выстрел так, как реагировали бы настоящие, — ты сам всё устраиваешь и смотришь, как работает физика.</p>
+   <h3>На чём работает игра?</h3>
+   <p>В современном браузере на Android-планшете, телефоне или компьютере, а в VR — на Meta Quest через WebXR.</p>
+   <h3>Как играть в VR?</h3>
+   <p>Открой wincegame.github.io в браузере Quest, нажми «Играть в браузере», потом VR.</p>
   </div>
  </section>
 
