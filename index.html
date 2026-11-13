@@ -23,7 +23,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Roboto+Flex:wdth,wght@25..151,100..1000&display=swap" rel="stylesheet">
 <script type="application/ld+json">
-{"@context":"https://schema.org","@type":"VideoGame","name":"Wince","alternateName":"Wince game","url":"https://wincegame.github.io/","description":"Free ragdoll sandbox game in a physics test chamber: mannequins, knife, machete, hammer, pistol, rifle and shotgun, realistic blood and X-ray. Runs in the browser and in VR on Meta Quest.","genre":["Sandbox","Simulation","Physics"],"gamePlatform":["Web browser","Android","PC","Meta Quest"],"image":"https://wincegame.github.io/og.jpg","inLanguage":["en","ru","pl"],"playMode":"SinglePlayer","applicationCategory":"Game","operatingSystem":"Any (web browser)","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}
+{"@context":"https://schema.org","@type":"VideoGame","name":"Wince","alternateName":"Wince game","url":"https://wincegame.github.io/","description":"Free ragdoll sandbox game in a physics test chamber: mannequins, knife, machete, hammer, pistol, rifle and shotgun, realistic blood and X-ray. Runs in the browser and in VR on Meta Quest.","genre":["Sandbox","Simulation","Physics"],"gamePlatform":["Web browser","Android","PC","Meta Quest"],"image":"https://wincegame.github.io/og.jpg","inLanguage":["en","ru","pl"],"sameAs":["https://discord.gg/ZphpKdUadg"],"playMode":"SinglePlayer","applicationCategory":"Game","operatingSystem":"Any (web browser)","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}}
 </script>
 <style>
 :root{--wall:#DCE1E6;--panel:#F1F3F5;--floor:#AEB9C6;--grout:#EEF2F5;--ink:#232A31;--mute:#4F5A65;--stripe:#E8622C;--bg:#E7EBEF;--line:#C4CBD2}
@@ -81,6 +81,7 @@ section+section{margin-top:clamp(44px,6vw,68px)}
 .note{border-left:6px solid var(--stripe);background:var(--panel);padding:16px 20px;border-radius:0 8px 8px 0;max-width:40em}
 .note p{margin:0}
 footer{max-width:1100px;margin:0 auto;padding:28px 20px 48px;color:var(--mute);font-size:15px;border-top:1px solid var(--line)}
+.comm p{margin:0 0 18px;max-width:40em}
 .faq{max-width:40em}
 .faq h3{font-size:19px;font-weight:750;margin:22px 0 4px}
 .faq h3:first-child{margin-top:0}
@@ -99,6 +100,7 @@ footer{max-width:1100px;margin:0 auto;padding:28px 20px 48px;color:var(--mute);f
   <div class="cta">
    <a class="btn go" href="wince.html"><span lang="en">Play in the browser</span><span lang="ru">Играть в браузере</span></a>
    <a class="btn vr" href="#vr"><span lang="en">How to play in VR</span><span lang="ru">Как играть в VR</span></a>
+   <a class="btn vr" href="https://discord.gg/ZphpKdUadg" target="_blank" rel="noopener"><span lang="en">Join the Discord</span><span lang="ru">Наш Discord</span></a>
   </div>
  </div>
  <div class="floor" aria-hidden="true"><svg class="tiles" viewBox="0 0 1600 300" preserveAspectRatio="xMidYMin slice" focusable="false"><rect class="t-bg" width="1600" height="300"/><path class="t-gr" d="M0 33.3 H1600 M0 75 H1600 M0 128.6 H1600 M0 200 H1600 M80 0 L-460 300 M170 0 L-280 300 M260 0 L-100 300 M350 0 L80 300 M440 0 L260 300 M530 0 L440 300 M620 0 L620 300 M710 0 L800 300 M800 0 L980 300 M890 0 L1160 300 M980 0 L1340 300 M1070 0 L1520 300 M1160 0 L1700 300 M1250 0 L1880 300 M1340 0 L2060 300 M1430 0 L2240 300 M1520 0 L2420 300"/><path class="t-st" d="M992.6 0 L1007 0 L1764.8 300 L1736 300 Z"/></svg></div>
@@ -171,6 +173,13 @@ footer{max-width:1100px;margin:0 auto;padding:28px 20px 48px;color:var(--mute);f
    <h3>Как играть в VR?</h3>
    <p>Открой wincegame.github.io в браузере Quest, нажми «Играть в браузере», потом VR.</p>
   </div>
+ </section>
+
+ <section id="community" class="comm">
+  <h2><span lang="en">Community</span><span lang="ru">Сообщество</span></h2>
+  <p lang="en">Share your clips, report bugs and suggest ideas on the Wince Discord server.</p>
+  <p lang="ru">Делись клипами, сообщай о багах и предлагай идеи на Discord-сервере Wince.</p>
+  <a class="btn go" href="https://discord.gg/ZphpKdUadg" target="_blank" rel="noopener"><span lang="en">Join the Discord</span><span lang="ru">Зайти в Discord</span></a>
  </section>
 
  <section>
