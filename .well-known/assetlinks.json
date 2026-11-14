@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "io.github.wincegame.wince",
+      "sha256_cert_fingerprints": [
+        "A6:45:E4:AF:CA:85:37:10:72:A9:A5:EE:94:B8:73:03:21:A0:B4:FF:88:F7:03:6A:F4:A2:8A:68:13:54:E1:B8"
+      ]
+    }
+  }
+]
