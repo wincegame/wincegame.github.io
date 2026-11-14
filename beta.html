@@ -63,6 +63,7 @@ body.edit .hud{outline:2px dashed #ffb48f;outline-offset:4px;cursor:move;pointer
 @media (max-width:700px){#tel{width:178px;padding:7px 9px}.id{font-size:15px}#hint{display:none}.btn{padding:8px 10px;font-size:12px}}
 @media (max-height:440px){#tools{display:grid;grid-template-columns:1fr 1fr;gap:4px}#tools .btn{padding:6px 9px;font-size:12px}}
 @media (prefers-reduced-motion:reduce){#toast,#hint{transition:none}}
+@media (orientation:portrait) and (max-width:600px){#tools{gap:5px}#tools .btn{padding:6px 9px;font-size:12px}}
 </style></head><body>
 <div id="msg">Не удалось загрузить 3D-библиотеки. Проверь интернет и обнови страницу.</div>
 <div id="cross"></div><div id="hm"></div>
@@ -308,7 +309,7 @@ const rd=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performan
 rd.setPixelRatio(Math.min(window.devicePixelRatio||1,1.5));rd.setSize(innerWidth,innerHeight);
 rd.shadowMap.enabled=true;rd.shadowMap.type=THREE.PCFSoftShadowMap;rd.domElement.className='gl';document.body.prepend(rd.domElement);
 const scene=new THREE.Scene();scene.background=new THREE.Color(0x30353b);
-const cam=new THREE.PerspectiveCamera(70,innerWidth/innerHeight,.03,80);cam.rotation.order='YXZ';scene.add(cam);
+const cam=new THREE.PerspectiveCamera(camFov(innerWidth/innerHeight),innerWidth/innerHeight,.03,80);cam.rotation.order='YXZ';scene.add(cam);
 scene.add(new THREE.HemisphereLight(0xf4f7fb,0x5d636b,.66));
 const sun=new THREE.DirectionalLight(0xffffff,.55);sun.position.set(5,14,7);sun.castShadow=true;{const sm=window.matchMedia&&matchMedia('(pointer:coarse)').matches?1024:2048;sun.shadow.mapSize.set(sm,sm)}
 Object.assign(sun.shadow.camera,{left:-16,right:16,top:16,bottom:-16,near:1,far:50});sun.shadow.bias=-.0004;scene.add(sun);
@@ -2379,7 +2380,8 @@ for(const id of HUD){const el=$(id);el.addEventListener('pointerdown',e=>{if(!ed
   el.style.left=x+'px';el.style.top=y+'px';el.style.right='auto';el.style.bottom='auto';CFG.pos[id]=[(x+r.width/2)/innerWidth,(y+r.height/2)/innerHeight]};
  const up=ev=>{if(ev.pointerId!==e.pointerId)return;el.removeEventListener('pointermove',mv);el.removeEventListener('pointerup',up);el.removeEventListener('pointercancel',up);saveCfg()};
  el.addEventListener('pointermove',mv);el.addEventListener('pointerup',up);el.addEventListener('pointercancel',up)},true)}
-addEventListener('resize',()=>{rd.setSize(innerWidth,innerHeight);cam.aspect=innerWidth/innerHeight;cam.updateProjectionMatrix();applyCfg()});
+function camFov(a){return a>=1?70:Math.min(102,Math.max(70,2*Math.atan(Math.tan(31*Math.PI/180)/a)*180/Math.PI))}
+addEventListener('resize',()=>{rd.setSize(innerWidth,innerHeight);cam.aspect=innerWidth/innerHeight;cam.fov=camFov(cam.aspect);cam.updateProjectionMatrix();applyCfg()});
 applyCfg();
 
 /* ================= игрок и управление ================= */
