@@ -6628,4 +6628,12 @@ $('lRu').onclick=()=>setLang('ru');$('lPl').onclick=()=>setLang('pl');$('lEn').o
 applyLang();
 rd.setAnimationLoop(loop);
 })();
-</script></body></html>
+</script><script>
+// Приложение Wince для Quest (APK) открывает игру с ?app=quest — сразу входим в VR (запуск по иконке считается действием игрока)
+(function(){if(!/[?&]app=quest\b/.test(location.search))return;var n=0;
+ function on(){return!!(window.__G&&__G.VR&&__G.VR.on)}
+ function go(){if(on())return;var b=document.getElementById('bVR');if(!b||!navigator.xr){if(++n<30)setTimeout(go,300);return}
+  b.click();if(++n<12)setTimeout(function(){if(!on())go()},1500)}
+ if(document.readyState==='complete')setTimeout(go,150);else addEventListener('load',function(){setTimeout(go,150)})})();
+</script>
+</body></html>
