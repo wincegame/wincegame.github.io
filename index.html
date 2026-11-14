@@ -90,6 +90,20 @@ footer{max-width:1100px;margin:0 auto;padding:28px 20px 48px;color:var(--mute);f
 .faq h3{font-size:19px;font-weight:750;margin:22px 0 4px}
 .faq h3:first-child{margin-top:0}
 .faq p{margin:0}
+.link{display:flex;flex-direction:column;align-items:flex-start;gap:10px;margin:12px 0 4px}
+.link code{flex:none;display:block;align-items:center;font-family:Archivo,system-ui,sans-serif;font-weight:750;font-variation-settings:"wdth" 108;font-size:clamp(18px,2.3vw,22px);padding:12px 14px;background:var(--bg);border:2px solid var(--line);border-radius:10px;user-select:all;-webkit-user-select:all;align-self:stretch}
+.link .btn{cursor:pointer;font-family:inherit}
+.link .btn.done{background:var(--ink);border-color:var(--ink);color:var(--wall)}
+#vrd{border:0;border-radius:14px;padding:0;width:min(560px,calc(100% - 32px));background:var(--panel);color:var(--ink);box-shadow:0 24px 60px rgba(10,14,18,.45)}
+#vrd::backdrop{background:rgba(14,18,22,.55)}
+#vrd .in{padding:26px 24px 24px;border-top:6px solid var(--stripe)}
+#vrd h2{font-size:clamp(24px,3vw,30px);margin:0 44px 14px 0}
+#vrd ol{margin:0;padding-left:1.3em}
+#vrd li{margin:0 0 12px}
+#vrd li:last-child{margin-bottom:0}
+#vrd .x{position:absolute;top:14px;right:14px;width:40px;height:40px;border-radius:20px;border:2px solid var(--line);background:transparent;color:var(--ink);font:700 22px/1 Archivo,system-ui,sans-serif;cursor:pointer}
+#vrd .onq{display:none;margin:0 0 16px}
+html.quest #vrd .onq{display:block}
 @media (max-width:760px){body{font-size:17px}}
 </style>
 </head>
@@ -103,7 +117,7 @@ footer{max-width:1100px;margin:0 auto;padding:28px 20px 48px;color:var(--mute);f
   <p class="lede" lang="ru">Песочница с рэгдоллами прямо в браузере. Манекены вздрагивают, кричат, истекают кровью и убегают — а у тебя нож, мачете, молоток, пистолет, автомат и дробовик. Играй на планшете или в VR на Meta Quest. Бесплатно и без установки.</p>
   <div class="cta">
    <a class="btn go" href="wince.html"><span lang="en">Play in the browser</span><span lang="ru">Играть в браузере</span></a>
-   <a class="btn vr" href="#vr"><span lang="en">How to play in VR</span><span lang="ru">Как играть в VR</span></a>
+   <a class="btn vr" href="#vr" id="vrOpen"><span lang="en">Play in VR</span><span lang="ru">Играть в VR</span></a>
    <a class="btn vr" href="https://discord.gg/ZphpKdUadg" target="_blank" rel="noopener"><span lang="en">Join the Discord</span><span lang="ru">Наш Discord</span></a>
   </div>
  </div>
@@ -146,8 +160,11 @@ footer{max-width:1100px;margin:0 auto;padding:28px 20px 48px;color:var(--mute);f
    </div>
    <div id="vr">
     <h3><span lang="en">In VR on Meta Quest</span><span lang="ru">В VR на Meta Quest</span></h3>
-    <p lang="en">Open this page in the Quest browser, tap “Play in the browser”, then press VR. The left stick walks, the right one turns. The trigger fires, the grip grabs — even from a distance. A switches weapons, B is slow motion, Y opens the panel on your left wrist: point the beam at a button and pull the trigger. Press the left stick for X-ray.</p>
-    <p lang="ru">Открой эту страницу в браузере Quest, нажми «Играть в браузере», потом VR. Левый стик — ходьба, правый — повороты. Курок — выстрел, кнопка хвата — схватить, даже издалека. A — смена оружия, B — замедление, Y — панель на левом запястье: наведи луч на кнопку и нажми курок. Нажми левый стик — рентген.</p>
+    <p lang="en">Open the browser in the Quest and paste this link into the address bar:</p>
+    <p lang="ru">Открой браузер в Quest и вставь в адресную строку эту ссылку:</p>
+    <div class="link"><code>wincegame.github.io/<wbr>wince.html</code><button type="button" class="btn go cp"><span lang="en">Copy</span><span lang="ru">Копировать</span></button></div>
+    <p lang="en">When the game loads, press VR. The left stick walks, the right one turns. The trigger fires, the grip grabs — even from a distance. A switches weapons, B is slow motion, Y opens the panel on your left wrist: point the beam at a button and pull the trigger. Press the left stick for X-ray.</p>
+    <p lang="ru">Когда игра загрузится, нажми VR. Левый стик — ходьба, правый — повороты. Курок — выстрел, кнопка хвата — схватить, даже издалека. A — смена оружия, B — замедление, Y — панель на левом запястье: наведи луч на кнопку и нажми курок. Нажми левый стик — рентген.</p>
    </div>
    <div>
     <h3><span lang="en">On a computer</span><span lang="ru">На компьютере</span></h3>
@@ -167,7 +184,7 @@ footer{max-width:1100px;margin:0 auto;padding:28px 20px 48px;color:var(--mute);f
    <h3>Which devices does it run on?</h3>
    <p>A modern browser on an Android tablet or phone or on a computer, and Meta Quest in VR through WebXR.</p>
    <h3>How do I play it in VR?</h3>
-   <p>Open wincegame.github.io in the Meta Quest browser, tap “Play in the browser”, then press VR.</p>
+   <p>Open the Meta Quest browser, go to wincegame.github.io/wince.html and press VR.</p>
   </div>
   <div class="faq" lang="ru">
    <h3>Wince бесплатный?</h3>
@@ -177,7 +194,7 @@ footer{max-width:1100px;margin:0 auto;padding:28px 20px 48px;color:var(--mute);f
    <h3>На чём работает игра?</h3>
    <p>В современном браузере на Android-планшете, телефоне или компьютере, а в VR — на Meta Quest через WebXR.</p>
    <h3>Как играть в VR?</h3>
-   <p>Открой wincegame.github.io в браузере Quest, нажми «Играть в браузере», потом VR.</p>
+   <p>Открой браузер в Quest, перейди по ссылке wincegame.github.io/wince.html и нажми VR.</p>
   </div>
  </section>
 
@@ -193,6 +210,26 @@ footer{max-width:1100px;margin:0 auto;padding:28px 20px 48px;color:var(--mute);f
  </section>
 </main>
 
+<dialog id="vrd" aria-labelledby="vrdT">
+ <div class="in">
+  <button type="button" class="x" aria-label="Close">×</button>
+  <h2 id="vrdT"><span lang="en">Play in VR on Meta Quest</span><span lang="ru">Играть в VR на Meta Quest</span></h2>
+  <div class="onq"><a class="btn go" href="wince.html"><span lang="en">Start the game</span><span lang="ru">Запустить игру</span></a></div>
+  <ol lang="en">
+   <li>Put on the headset and open the Browser.</li>
+   <li>Paste this link into the address bar — or type it:
+    <div class="link"><code>wincegame.github.io/<wbr>wince.html</code><button type="button" class="btn go cp">Copy</button></div></li>
+   <li>When the game loads, press VR.</li>
+  </ol>
+  <ol lang="ru">
+   <li>Надень шлем и открой Браузер.</li>
+   <li>Вставь эту ссылку в адресную строку — или набери её:
+    <div class="link"><code>wincegame.github.io/<wbr>wince.html</code><button type="button" class="btn go cp">Копировать</button></div></li>
+   <li>Когда игра загрузится, нажми VR.</li>
+  </ol>
+ </div>
+</dialog>
+
 <footer><span lang="en">Wince runs entirely in your browser — free, no install, no account. The game speaks English, Russian and Polish.</span><span lang="ru">Wince работает прямо в браузере — бесплатно, без установки и регистрации. Языки игры: русский, английский и польский.</span></footer>
 
 <script>
@@ -201,6 +238,16 @@ footer{max-width:1100px;margin:0 auto;padding:28px 20px 48px;color:var(--mute);f
  var l=null;try{l=localStorage.getItem('wince-lang')}catch(e){}
  if(l!=='en'&&l!=='ru')l=(navigator.language||'').toLowerCase().indexOf('ru')===0?'ru':'en';set(l);
  for(var i=0;i<b.length;i++)b[i].addEventListener('click',function(){set(this.getAttribute('data-set'))});
+ var URL='https://wincegame.github.io/wince.html',d=document.getElementById('vrd'),o=document.getElementById('vrOpen');
+ if(/OculusBrowser|Quest/i.test(navigator.userAgent))h.classList.add('quest');
+ function txt(e,ru,en){var s=e.querySelector('[lang]');if(s){var q=e.querySelectorAll('[lang]');for(var k=0;k<q.length;k++)q[k].textContent=q[k].getAttribute('lang')==='ru'?ru:en}else e.textContent=h.getAttribute('data-l')==='ru'?ru:en}
+ function copy(e){var btn=e.currentTarget,done=function(){btn.classList.add('done');txt(btn,'Скопировано ✓','Copied ✓');setTimeout(function(){btn.classList.remove('done');txt(btn,'Копировать','Copy')},2200)};
+  var old=function(){var t=document.createElement('textarea');t.value=URL;t.setAttribute('readonly','');t.style.position='fixed';t.style.top='0';t.style.opacity='0';document.body.appendChild(t);t.select();try{if(document.execCommand('copy'))done()}catch(er){}document.body.removeChild(t)};
+  if(navigator.clipboard&&window.isSecureContext)navigator.clipboard.writeText(URL).then(done,old);else old()}
+ var c=document.querySelectorAll('.cp');for(var j=0;j<c.length;j++)c[j].addEventListener('click',copy);
+ if(d&&o&&d.showModal){o.addEventListener('click',function(e){e.preventDefault();d.showModal()});
+  d.querySelector('.x').addEventListener('click',function(){d.close()});
+  d.addEventListener('click',function(e){if(e.target===d)d.close()})}
 })();
 </script>
 </body>
