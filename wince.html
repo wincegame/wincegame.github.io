@@ -2671,15 +2671,8 @@ function gunSupport(S,ud){const sm=S.model;if(!sm)return;const sc=GUN.scale.x;
  else{gunHoldM(S,GHH);GHT.makeTranslation(.014,0,.022);GHH.multiply(GHT)}
  GHI.copy(S.grip.matrixWorld).invert().multiply(GHH);GHI.decompose(sm.position,sm.quaternion,sm.scale);sm.updateMatrixWorld(true);
  if(!S.g2.fq||S.g2.w!==wi){S.g2.w=wi;S.g2.fq=ud.fore?hConform(S,boxHit([ud.fore]),{tmax:.95,w:[1,.8,.6],td:GHO.td2}):hConform(S,boxHit([ud.grip],.017),{tmax:.95,w:[1,.8,.6]})}}
-// двумя руками: дрожь руки на курке не раскачивает ствол (сглаживаем точку кулака, пока рука на цевье стоит)
-const GSQ=new Q4(),GSQi=new Q4(),GSV=new V3(),GSB=new V3(),GST=new V3(),GSS=new V3();
-function gunSteady(R,dt){if(VR.M)VR.M.decompose(GST,GSQ,GSS);else{GST.set(0,0,0);GSQ.set(0,0,0,1)}GSQi.copy(GSQ).invert();
- GSV.copy(GHA).sub(GST).applyQuaternion(GSQi);GSB.copy(GHB).sub(GST).applyQuaternion(GSQi);
- const now=performance.now(),g=R.gs;if(!g||now-g.t>250||g.w!==wi){R.gs={a:GSV.clone(),b:GSB.clone(),t:now,w:wi,v:0};return}
- dt=Math.max(1/240,Math.min(.05,dt||1/72));const vb=g.b.distanceTo(GSB)/dt;g.b.copy(GSB);g.v+=(vb-g.v)*Math.min(1,dt*20);
- const k=Math.min(1,Math.max(0,(g.v-.06)/.45)),tau=.16*(1-k)+.02*k;
- if(g.a.distanceTo(GSV)>.12)g.a.copy(GSV);else g.a.lerp(GSV,1-Math.exp(-dt/tau));g.t=now;
- GHA.copy(g.a).applyQuaternion(GSQ).add(GST)}
+// поза оружия до лазера и выстрела (иначе двумя руками лазер и пули брали поворот оружия из прошлого кадра)
+function gunPre(){try{if(VR.R&&VR.R.src&&GUN.parent===VR.R.ray)gunHand(1e-6)}catch(e){bugLog('gunPre',e)}}
 function gunHand(dt){dt=dt||1/72;const R=VR.on&&VR.R&&VR.R.src?VR.R:null;if(!R||GUN.parent!==R.ray||!R.model)return;const hm=R.model,ud=GM[wi]&&GM[wi].userData;
  if(!VR.muz)VR.muz=new V3();if(!VR.mq)VR.mq=new Q4();
  if(WPN[wi].nogun||!ud||!ud.grip){if(R.ghand){R.ghand=false;R.gw=-1;hNomApply(R)}gunSupOff();R.g2f=0;GUN.quaternion.set(0,0,0,1);GUN.position.set(0,-.035,VR.gz+recoil*.04);GUN.rotation.x=recoil*.14;
@@ -2689,7 +2682,7 @@ function gunHand(dt){dt=dt||1/72;const R=VR.on&&VR.R&&VR.R.src?VR.R:null;if(!R||
  let S=VR.C.find(c=>c!==R&&c.g2&&c.src)||null;if(S){S.grip.updateMatrixWorld(true);const k=ud.fore||ud.grip;k.updateMatrixWorld();k.getWorldPosition(GHA);GHB.copy(HOFF).applyMatrix4(S.grip.matrixWorld);if(GHA.distanceTo(GHB)>.35){gunSupDrop(S);S=null}}
  // 1) поворот оружия относительно луча руки: двумя руками (автомат, дробовик) — ствол от кулака к руке на цевье
  GHQ0.set(0,0,0,1);R.g2f=Math.max(0,Math.min(1,(R.g2f||0)+(S&&ud.fore?dt:-dt)*9));
- if(S&&ud.fore){GHA.copy(HOFF).applyMatrix4(R.grip.matrixWorld);GHB.copy(HOFF).applyMatrix4(S.grip.matrixWorld);gunSteady(R,dt);GHW.subVectors(GHB,GHA);
+ if(S&&ud.fore){GHA.copy(HOFF).applyMatrix4(R.grip.matrixWorld);GHB.copy(HOFF).applyMatrix4(S.grip.matrixWorld);GHW.subVectors(GHB,GHA);
   if(GHW.lengthSq()>.0064){GHW.normalize();GHF.subVectors(ud.fore.position,ud.grip.position);if(ud.pump)GHF.z+=ud.pump.position.z;GHF.x=0;GHF.normalize();
    GHE1.set(1,0,0).applyQuaternion(GHQI);GHE1.addScaledVector(GHW,-GHE1.dot(GHW));if(GHE1.lengthSq()>1e-6){GHE1.normalize();GHE3.crossVectors(GHE1,GHW);GHe3.crossVectors(GHe1,GHF);
     GHM.makeBasis(GHE1,GHW,GHE3);GHM2.makeBasis(GHe1,GHF,GHe3).transpose();GHM.multiply(GHM2);GHQ3.setFromRotationMatrix(GHM);R.g2q=(R.g2q||new Q4()).copy(GHQI).invert().multiply(GHQ3)}}}
@@ -2942,7 +2935,7 @@ function vrHands(){for(const c of VR.C){if(!c.src||c.g||c.g2||(c===VR.R&&((VR.kn
  if(!n&&c!==VR.R){const h=vrRayHit(c,4);if(h){f=true;c.pl.scale.set(1,1,h.distance)}}c.pl.visible=f;
  if(n!==c.near||f!==c.far){if(n&&!c.near)vrPulse(c,.08,10);c.near=n;c.far=f;c.model.userData.b.material=n||f?HMATH:HMAT}}}
 function vrLaser(){const R=VR.R;if(!R||!R.src||!R.ray.visible){LDOT.visible=false;VR.hover=-1;return}R.ray.updateMatrixWorld(true);VRp.setFromMatrixPosition(R.ray.matrixWorld);VRd.set(0,0,-1).transformDirection(R.ray.matrixWorld);RC.set(VRp,VRd);RC.far=40;let dist=40,pt=null;
- let hv=-1;if(VP.m.parent&&VP.m.visible){VP.m.updateMatrixWorld();VP.m.material.side=THREE.DoubleSide;const ph=RC.intersectObject(VP.m,false)[0];VP.m.material.side=THREE.FrontSide;
+ let hv=-1;if(VP.m.parent&&VP.m.visible&&!(VR.L&&VR.L.g2)){VP.m.updateMatrixWorld();VP.m.material.side=THREE.DoubleSide;const ph=RC.intersectObject(VP.m,false)[0];VP.m.material.side=THREE.FrontSide;
   if(ph&&ph.distance<1.5&&ph.uv){const px=ph.uv.x*VPW,py=(1-ph.uv.y)*VPH;hv=-2;for(let i=0;i<VR.btns.length;i++){const B=VR.btns[i];if(B.fn&&px>=B.x&&px<=B.x+B.w&&py>=B.y&&py<=B.y+B.h){hv=i;break}}
    LZ.visible=true;LZ.scale.set(1,1,Math.max(.02,ph.distance));LDOT.visible=true;LDOT.position.copy(ph.point).addScaledVector(VRd,-.004);LDOT.scale.set(.012,.012,.012)}}
  if(hv!==VR.hover){if(hv>=0)vrPulse(R,.08,8);VR.hover=hv;vrPanel()}VR.lzP=hv!==-1;if(VR.lzP){LZ.position.set(0,0,0);LZ.quaternion.set(0,0,0,1)}else{if(VR.muz){LZ.position.copy(VR.muz);if(VR.mq)LZ.quaternion.copy(VR.mq)}aimRay(VRp,VRd);RC.set(VRp,VRd)}if(hv!==-1){trig=false;return}
@@ -2980,7 +2973,7 @@ function vrPlayer(dt){kick=Math.max(0,kick-dt*kick*9-dt*.02);const h=cam.positio
  if(VR.dist>.72){VR.dist=0;PL.stp=(PL.stp||0)+1;const wet=playerStep(),qt=(VR.hs||0)<1.05||cam.position.y-PL.feet<1.2;T4.set(PL.x,PL.feet,PL.z);sfxStep(T4,qt?.6:1.3,wet,qt?.28:.5);heardPlayer(false,qt)}
  if(hmT>VR.hm+.001&&VR.R)vrPulse(VR.R,.3,22);VR.hm=hmT;
  if(VR.msgT>0){VR.msgT-=dt;if(VR.msgT<=0)vrPanel()}
- handsUpd(dt);vrHands();vrLaser()}
+ gunPre();handsUpd(dt);vrHands();vrLaser()}
 // Режим сидя: мир опускается так, чтобы глаза оказались на высоте стоящего человека (~1,62 м). Пол тогда не достать рукой — хватай издалека.
 function vrSeat(on,quiet){VR.sit=!!on;try{localStorage.setItem('ragdollLab.vrSit',on?'1':'0')}catch(e){}if(!VR.on)return;let ns=0;
  if(on){const H=cam.position.y-VR.M.elements[13]+VR.eye+VR.seat;ns=VR.local?.45:clamp(1.62-H,.15,.95)}const d=ns-VR.seat;VR.seat=ns;VR.seat0=ns;if(Math.abs(d)>1e-4)vrMove(0,d,0);if(!quiet)toast(on?'Режим сидя':'Режим стоя');vrPanel()}
