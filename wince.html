@@ -2671,6 +2671,15 @@ function gunSupport(S,ud){const sm=S.model;if(!sm)return;const sc=GUN.scale.x;
  else{gunHoldM(S,GHH);GHT.makeTranslation(.014,0,.022);GHH.multiply(GHT)}
  GHI.copy(S.grip.matrixWorld).invert().multiply(GHH);GHI.decompose(sm.position,sm.quaternion,sm.scale);sm.updateMatrixWorld(true);
  if(!S.g2.fq||S.g2.w!==wi){S.g2.w=wi;S.g2.fq=ud.fore?hConform(S,boxHit([ud.fore]),{tmax:.95,w:[1,.8,.6],td:GHO.td2}):hConform(S,boxHit([ud.grip],.017),{tmax:.95,w:[1,.8,.6]})}}
+// двумя руками: дрожь руки на курке не раскачивает ствол (сглаживаем точку кулака, пока рука на цевье стоит)
+const GSQ=new Q4(),GSQi=new Q4(),GSV=new V3(),GSB=new V3(),GST=new V3(),GSS=new V3();
+function gunSteady(R,dt){if(VR.M)VR.M.decompose(GST,GSQ,GSS);else{GST.set(0,0,0);GSQ.set(0,0,0,1)}GSQi.copy(GSQ).invert();
+ GSV.copy(GHA).sub(GST).applyQuaternion(GSQi);GSB.copy(GHB).sub(GST).applyQuaternion(GSQi);
+ const now=performance.now(),g=R.gs;if(!g||now-g.t>250||g.w!==wi){R.gs={a:GSV.clone(),b:GSB.clone(),t:now,w:wi,v:0};return}
+ dt=Math.max(1/240,Math.min(.05,dt||1/72));const vb=g.b.distanceTo(GSB)/dt;g.b.copy(GSB);g.v+=(vb-g.v)*Math.min(1,dt*20);
+ const k=Math.min(1,Math.max(0,(g.v-.06)/.45)),tau=.16*(1-k)+.02*k;
+ if(g.a.distanceTo(GSV)>.12)g.a.copy(GSV);else g.a.lerp(GSV,1-Math.exp(-dt/tau));g.t=now;
+ GHA.copy(g.a).applyQuaternion(GSQ).add(GST)}
 function gunHand(dt){dt=dt||1/72;const R=VR.on&&VR.R&&VR.R.src?VR.R:null;if(!R||GUN.parent!==R.ray||!R.model)return;const hm=R.model,ud=GM[wi]&&GM[wi].userData;
  if(!VR.muz)VR.muz=new V3();if(!VR.mq)VR.mq=new Q4();
  if(WPN[wi].nogun||!ud||!ud.grip){if(R.ghand){R.ghand=false;R.gw=-1;hNomApply(R)}gunSupOff();R.g2f=0;GUN.quaternion.set(0,0,0,1);GUN.position.set(0,-.035,VR.gz+recoil*.04);GUN.rotation.x=recoil*.14;
@@ -2680,7 +2689,7 @@ function gunHand(dt){dt=dt||1/72;const R=VR.on&&VR.R&&VR.R.src?VR.R:null;if(!R||
  let S=VR.C.find(c=>c!==R&&c.g2&&c.src)||null;if(S){S.grip.updateMatrixWorld(true);const k=ud.fore||ud.grip;k.updateMatrixWorld();k.getWorldPosition(GHA);GHB.copy(HOFF).applyMatrix4(S.grip.matrixWorld);if(GHA.distanceTo(GHB)>.35){gunSupDrop(S);S=null}}
  // 1) поворот оружия относительно луча руки: двумя руками (автомат, дробовик) — ствол от кулака к руке на цевье
  GHQ0.set(0,0,0,1);R.g2f=Math.max(0,Math.min(1,(R.g2f||0)+(S&&ud.fore?dt:-dt)*9));
- if(S&&ud.fore){GHA.copy(HOFF).applyMatrix4(R.grip.matrixWorld);GHB.copy(HOFF).applyMatrix4(S.grip.matrixWorld);GHW.subVectors(GHB,GHA);
+ if(S&&ud.fore){GHA.copy(HOFF).applyMatrix4(R.grip.matrixWorld);GHB.copy(HOFF).applyMatrix4(S.grip.matrixWorld);gunSteady(R,dt);GHW.subVectors(GHB,GHA);
   if(GHW.lengthSq()>.0064){GHW.normalize();GHF.subVectors(ud.fore.position,ud.grip.position);if(ud.pump)GHF.z+=ud.pump.position.z;GHF.x=0;GHF.normalize();
    GHE1.set(1,0,0).applyQuaternion(GHQI);GHE1.addScaledVector(GHW,-GHE1.dot(GHW));if(GHE1.lengthSq()>1e-6){GHE1.normalize();GHE3.crossVectors(GHE1,GHW);GHe3.crossVectors(GHe1,GHF);
     GHM.makeBasis(GHE1,GHW,GHE3);GHM2.makeBasis(GHe1,GHF,GHe3).transpose();GHM.multiply(GHM2);GHQ3.setFromRotationMatrix(GHM);R.g2q=(R.g2q||new Q4()).copy(GHQI).invert().multiply(GHQ3)}}}
