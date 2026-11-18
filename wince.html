@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="ru"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<title>Wince v62</title>
+<title>Wince v65</title>
 <style>
 :root{--panel:rgba(15,17,21,.82);--tx:#eef1f4;--mut:#a3abb5;--ln:rgba(255,255,255,.16);--acc:#e2622d;--bld:#c0141c;--fire:rgba(166,26,22,.9);--bg:#30353b;--bs:1;--op:1}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--panel:rgba(15,17,21,.82);--bg:#30353b}}
@@ -64,31 +64,59 @@ body.edit .hud{outline:2px dashed #ffb48f;outline-offset:4px;cursor:move;pointer
 @media (max-height:440px){#tools{display:grid;grid-template-columns:1fr 1fr;gap:4px}#tools .btn{padding:6px 9px;font-size:12px}}
 @media (prefers-reduced-motion:reduce){#toast,#hint{transition:none}}
 @media (orientation:portrait) and (max-width:600px){#tools{gap:5px}#tools .btn{padding:6px 9px;font-size:12px}}
+#med{display:none;margin-top:8px;border-top:1px solid rgba(255,255,255,.1);padding-top:6px}#med .mh{display:flex;justify-content:space-between;align-items:center;font-size:11.5px;color:var(--mut)}#med .mh b{color:var(--tx);font-size:12px}#medN i{display:inline-block;width:7px;height:7px;border-radius:50%;margin:0 3px 0 7px}#med .mb{display:flex;gap:8px;margin-top:5px}#medFig{width:62px;height:118px;flex:none;display:block}#medL{flex:1;min-width:0;max-height:118px;overflow-y:auto;pointer-events:auto;touch-action:pan-y;overscroll-behavior:contain;scrollbar-width:thin}#medL.more{-webkit-mask-image:linear-gradient(#000 78%,transparent);mask-image:linear-gradient(#000 78%,transparent)}#medL .mi{display:flex;gap:5px;font-size:10.5px;line-height:1.25;margin-bottom:5px}#medL .mi>i{flex:none;width:7px;height:7px;border-radius:50%;margin-top:3px}#medL .mi b{display:block;color:var(--tx);font-weight:600}#medL .mi span{color:#a9b2bc}#medL .none{font-size:10.5px;color:var(--mut)}@media (max-width:700px){#medFig{width:52px;height:100px}#medL{max-height:100px}}@media (max-height:520px){#med{margin-top:5px;padding-top:4px}#medFig{width:42px;height:80px}#medL{max-height:80px}}
+#mact{position:fixed;min-width:94px;opacity:var(--op);z-index:3;background:rgba(122,92,48,.88);border-color:transparent}#mact.stab{background:rgba(150,38,30,.9)}
+#fps{position:fixed;top:calc(env(safe-area-inset-top,0px) + 8px);left:50%;transform:translateX(-50%);display:none;background:var(--panel);border-radius:6px;padding:3px 8px;font:600 12px system-ui,sans-serif;color:#cfe8c9;pointer-events:none;z-index:2}
+#cfg .btn{touch-action:pan-y}#cfg .tabs{display:flex;gap:6px;margin:2px 0 4px}#cfg .tab{flex:1;padding:8px 4px}#cfg .tp{min-height:120px}#cfg .wide{width:100%;margin-top:6px}#cfg .note{margin:10px 0 0;font-size:11.5px;color:var(--mut)}#cfg .lrow .seg .btn{padding:8px 4px;font-size:12.5px}.gph{margin-top:14px;font-size:12px;color:var(--mut)}.gph b{color:var(--tx);font-size:12.5px}.gph dl{display:grid;grid-template-columns:auto 1fr;gap:3px 12px;margin:7px 0 0}.gph dt{color:var(--tx);font-weight:600}.gph dd{margin:0}
+body.gp #joy,body.gp #fire,body.gp #grab,body.gp #hint{display:none}
 </style></head><body>
 <div id="msg">Не удалось загрузить 3D-библиотеки. Проверь интернет и обнови страницу.</div>
 <div id="cross"></div><div id="hm"></div>
-<div id="tel" class="hud"><div class="th"><b>WINCE v62</b><span>телеметрия</span></div><div id="tb"></div></div>
+<div id="tel" class="hud"><div class="th"><b>WINCE v65</b><span>телеметрия</span></div><div id="tb"></div><div id="med"><div class="mh"><b>Травмы</b><span id="medN"></span></div><div class="mb"><canvas id="medFig"></canvas><div id="medL"></div></div></div></div>
 <div id="tools" class="hud"><button class="btn" id="bVR" style="display:none">VR</button><button class="btn" id="bAdd">+ Манекен</button><button class="btn" id="bAi">Отключить ИИ</button><button class="btn" id="bGhost">Невидимка</button><button class="btn" id="bSlow">Замедление</button><button class="btn" id="bClean">Убрать кровь</button><button class="btn" id="bReset">Сброс</button><button class="btn" id="bXr">Рентген</button><button class="btn" id="bSt">Статистика</button><button class="btn" id="bCfg">Настройки</button></div>
 <div id="joy" class="hud"><div id="knob"></div></div>
 <button class="btn hud" id="wpn">Пистолет</button>
-<button class="btn" id="medt" style="display:none"></button>
+<button class="btn" id="medt" style="display:none"></button><button class="btn" id="mact" style="display:none"></button>
 <div id="medp"></div>
 <div id="twg"><div class="box"><canvas id="twc" width="600" height="600"></canvas><p id="twh"></p><button class="btn" id="twx">×</button></div></div>
 <button class="btn hud" id="grab">Схватить</button>
 <button class="btn hud" id="fire">Огонь</button>
 <div id="hint">Левый круг: ходьба. Веди пальцем по экрану: обзор. «Схватить» держи, чтобы тащить манекен.</div>
-<div id="toast"></div>
+<div id="toast"></div><div id="fps"></div>
 <div id="cfg"><div class="box">
  <h3>Настройки</h3><p>Настройки сохраняются на этом устройстве.</p>
+ <div class="tabs"><button class="btn tab on" data-tab="game">Игра</button><button class="btn tab" data-tab="ctl">Управление</button><button class="btn tab" data-tab="gfx">Графика</button></div>
+ <section class="tp" data-tab="game">
  <div class="lrow"><label>Язык</label><div class="seg"><button class="btn" id="lRu" lang="ru">Русский</button><button class="btn" id="lPl" lang="pl">Polski</button><button class="btn" id="lEn" lang="en">English</button></div></div>
+ <div class="crow"><label for="sVol">Громкость</label><input type="range" id="sVol" min="0" max="1" step="0.05"></div>
+ <div class="crow"><label for="cTel">Показывать телеметрию</label><input type="checkbox" id="cTel"></div>
+ <div class="crow"><label for="cFps">Показывать FPS</label><input type="checkbox" id="cFps"></div>
+ </section>
+ <section class="tp" data-tab="ctl" hidden>
  <div class="crow"><label>Раскладка</label><div class="seg"><button class="btn" id="pStd">Обычная</button><button class="btn" id="p3">3 пальца</button></div></div>
  <div class="crow"><label for="sSens">Чувствительность обзора</label><input type="range" id="sSens" min="0.4" max="2.5" step="0.05"></div>
  <div class="crow"><label for="sSize">Размер кнопок</label><input type="range" id="sSize" min="0.7" max="1.5" step="0.05"></div>
  <div class="crow"><label for="sOp">Прозрачность кнопок</label><input type="range" id="sOp" min="0.3" max="1" step="0.05"></div>
  <div class="crow"><label for="cAim">Целиться, ведя пальцем по «Огню»</label><input type="checkbox" id="cAim"></div>
  <div class="crow"><label for="cRun">Бег, если джойстик до упора</label><input type="checkbox" id="cRun"></div>
- <div class="crow"><label for="cTel">Показывать телеметрию</label><input type="checkbox" id="cTel"></div>
- <div class="seg" style="margin-top:16px"><button class="btn" id="bEdit">Расставить кнопки</button><button class="btn on" id="bCfgClose">Готово</button></div>
+ <button class="btn wide" id="bEdit">Расставить кнопки</button>
+ <div class="gph"><b>Геймпад</b><dl>
+  <dt>Левый стик</dt><dd>ходьба, нажать — бег</dd><dt>Правый стик</dt><dd>обзор</dd>
+  <dt>RT</dt><dd>огонь, удар, применить</dd><dt>LT</dt><dd>схватить (держи)</dd>
+  <dt>RB / LB</dt><dd>следующее / прошлое оружие</dd><dt>A</dt><dd>средство аптечки, режим мачете</dd>
+  <dt>X</dt><dd>рентген</dd><dt>Y</dt><dd>+ манекен</dd><dt>B</dt><dd>закрыть окно</dd><dt>Start</dt><dd>настройки</dd>
+ </dl></div>
+ </section>
+ <section class="tp" data-tab="gfx" hidden>
+ <div class="lrow"><label>Качество</label><div class="seg" id="gQ"><button class="btn" data-v="0">Низкое</button><button class="btn" data-v="1">Среднее</button><button class="btn" data-v="2">Высокое</button></div></div>
+ <div class="lrow"><label>Разрешение</label><div class="seg" id="gRes"><button class="btn" data-v="0">Авто</button><button class="btn" data-v="0.5">50%</button><button class="btn" data-v="0.75">75%</button><button class="btn" data-v="1">100%</button></div></div>
+ <div class="lrow"><label>Частота кадров</label><div class="seg" id="gFps"><button class="btn" data-v="30">30</button><button class="btn" data-v="60">60</button><button class="btn" data-v="0">Макс.</button></div></div>
+ <div class="lrow"><label>Тени</label><div class="seg" id="gSh"><button class="btn" data-v="0">Выкл.</button><button class="btn" data-v="1">Низкие</button><button class="btn" data-v="2">Высокие</button></div></div>
+ <div class="lrow"><label>Кровь</label><div class="seg" id="gBl"><button class="btn" data-v="0">Выкл.</button><button class="btn" data-v="0.35">Мало</button><button class="btn" data-v="1">Обычно</button><button class="btn" data-v="1.6">Много</button></div></div>
+ <div class="lrow"><label>Расчленение от выстрелов</label><div class="seg" id="gGore"><button class="btn" data-v="1">Вкл.</button><button class="btn" data-v="0">Выкл.</button></div></div>
+ <p class="note">Мачете режет и отрубает всегда.</p>
+ </section>
+ <div class="seg" style="margin-top:14px"><button class="btn on" id="bCfgClose">Готово</button></div>
 </div></div>
 <div id="statp"><div class="box">
  <h3>Статистика</h3><p>Статистика сохраняется на этом устройстве.</p>
@@ -113,12 +141,22 @@ body.edit .hud{outline:2px dashed #ffb48f;outline-offset:4px;cursor:move;pointer
 const SRC0=(()=>{try{return'<!DOCTYPE html>\n'+document.documentElement.outerHTML}catch(e){return''}})();
 const VR={on:false,sup:false,base:null,cur:null,M:null,ses:null,C:[],R:null,L:null,turnA:true,align:0,dist:0,lx:null,lz:null,hm:0,msg:'',msgT:0,panel:true,yT:-1,yDone:false,local:false,eye:0,gz:.03,sit:false,seat:0,hover:-1,bT:-1,bDone:false};
 const $=id=>document.getElementById(id);
+// v65: настройки графики и звука (сохраняются на этом устройстве)
+const GFX={res:0,fps:0,sh:-1,vsh:2,vres:.9,hz:0,blood:1,gore:true,vol:1,show:false},GK='wince.gfx.v1';try{const s=JSON.parse(localStorage.getItem(GK)||'null');if(s&&typeof s==='object')for(const k in GFX)if(typeof s[k]===typeof GFX[k])GFX[k]=s[k]}catch(e){}
+
 /* ================= языки: русский / польский / английский ================= */
 // Внутри игры все тексты на русском; при показе они переводятся по словарю (самые длинные фразы — первыми).
 const LANGS=['ru','pl','en'],LK='ragdollLab.lang';let LANG='';
 try{LANG=localStorage.getItem(LK)||''}catch(e){}
 if(LANGS.indexOf(LANG)<0)LANG='en';
 const DICT=[
+['Игра','Gra','Game'],['Управление','Sterowanie','Controls'],['Графика','Grafika','Graphics'],['Громкость','Głośność','Volume'],['Показывать FPS','Pokazuj FPS','Show FPS'],['Геймпад подключён','Kontroler podłączony','Gamepad connected'],['Геймпад отключён','Kontroler odłączony','Gamepad disconnected'],['Геймпад','Kontroler','Gamepad'],['Левый стик','Lewa gałka','Left stick'],['ходьба, нажать — бег','chodzenie, wciśnij — bieg','walk, click — run'],['Правый стик','Prawa gałka','Right stick'],['обзор','rozglądanie','look around'],['огонь, удар, применить','strzał, cios, użyj','fire, strike, apply'],['схватить (держи)','chwyć (trzymaj)','grab (hold)'],['следующее / прошлое оружие','następna / poprzednia broń','next / previous weapon'],['средство аптечки, режим мачете','środek z apteczki, tryb maczety','med kit item, machete mode'],['закрыть окно','zamknij okno','close window'],
+['Качество','Jakość','Quality'],['Низкое','Niska','Low'],['Среднее','Średnia','Medium'],['Высокое','Wysoka','High'],['Обычное','Zwykła','Normal'],['Разрешение сменится, когда снова войдёшь в VR','Rozdzielczość zmieni się po ponownym wejściu do VR','Resolution changes the next time you enter VR'],['Разрешение','Rozdzielczość','Resolution'],['Авто','Auto','Auto'],['Частота кадров','Liczba klatek','Frame rate'],['Макс.','Maks.','Max'],['Тени','Cienie','Shadows'],['Низкие','Niskie','Low'],['Высокие','Wysokie','High'],['Кровь','Krew','Blood'],['Мало','Mało','Less'],['Много','Dużo','More'],['Расчленение от выстрелов','Odrywanie kończyn od strzałów','Dismemberment from gunshots'],['Мачете режет и отрубает всегда.','Maczeta zawsze tnie i odcina.','The machete always cuts and severs.'],['+ манекен','+ manekin','+ mannequin'],['разрез ','cięcie ','cut '],[' Гц',' Hz',' Hz'],
+['Мачете: кнопка над оружием — рубить или колоть','Maczeta: przycisk nad bronią — rąb albo dźgaj','Machete: the button above the weapon switches chop / stab'],['Мачете: колоть','Maczeta: dźganie','Machete: stab'],['Мачете: рубить','Maczeta: rąbanie','Machete: chop'],['Колоть','Dźgaj','Stab'],['Рубить','Rąb','Chop'],['колотая рана','rana kłuta','stab wound'],['Мачете — руби, пили или коли остриём · левый хват — держать','Maczeta — rąb, piłuj albo dźgaj sztychem · lewy chwyt — trzymaj','Machete — chop, saw or stab with the tip · left grip — hold'],
+['Это окно не умеет VR (например, просмотр файла или встроенный браузер приложения). Открой игру по ссылке в браузере шлема и нажми VR.','To okno nie obsługuje VR (np. podgląd pliku albo wbudowana przeglądarka aplikacji). Otwórz grę z linku w przeglądarce gogli i naciśnij VR.','This window can’t run VR (for example, a file viewer or an app’s built-in browser). Open the game from its link in the headset browser and press VR.'],['Игра открыта из «Файлов» (адрес начинается с content://) — так браузер шлема не даёт включить VR. Открой игру по ссылке в браузере шлема и нажми VR.','Gra została otwarta z „Plików” (adres zaczyna się od content://) — wtedy przeglądarka gogli nie pozwala włączyć VR. Otwórz grę z linku w przeglądarce gogli i naciśnij VR.','The game was opened from Files (the address starts with content://), so the headset browser won’t allow VR. Open the game from its link in the headset browser and press VR.'],['Браузер не даёт запустить VR внутри страницы claude.ai. Скачай игру файлом и открой его в браузере шлема — там кнопка VR заработает.','Przeglądarka nie pozwala uruchomić VR na stronie claude.ai. Pobierz grę jako plik i otwórz go w przeglądarce gogli — tam przycisk VR zadziała.','The browser won’t start VR inside the claude.ai page. Download the game as a file and open it in the headset browser — the VR button will work there.'],
+['Мачете — руби или пили: води клинком в разрезе и дави · левый хват — держать','Maczeta — rąb albo piłuj: prowadź ostrze w nacięciu i dociskaj · lewy chwyt — trzymaj','Machete — chop or saw: move the blade in the cut and press · left grip — hold'],['Хват ножа: ','Chwyt noża: ','Knife grip: '],['Наклон руки: ','Pochylenie ręki: ','Hand tilt: '],['Обычный рост','Zwykły wzrost','Normal height'],['Ниже на ','Niżej o ','Lower by '],['Выше на ','Wyżej o ','Higher by '],[' см',' cm',' cm'],['тело рассечено','ciało przecięte','body cut in two'],['разрублен мозг','mózg rozrąbany','brain chopped'],['обезглавлен','dekapitacja','decapitated'],['бедренная вена','żyła udowa','femoral vein'],['большеберцовая артерия','tętnica piszczelowa','tibial artery'],['подколенная артерия','tętnica podkolanowa','popliteal artery'],['лучевая артерия','tętnica promieniowa','radial artery'],['верхняя челюсть','szczęka','upper jaw'],['локтевая кость','kość łokciowa','ulna'],['малоберцовая кость','kość strzałkowa','fibula'],['лопатка','łopatka','shoulder blade'],['носовая полость','jama nosowa','nasal cavity'],['пазуха','zatoka','sinus'],['пищевод','przełyk','esophagus'],['трахея','tchawica','trachea'],['левый глаз','lewe oko','left eye'],['правый глаз','prawe oko','right eye'],['оскольчатый перелом: ','złamanie wieloodłamowe: ','comminuted fracture: '],['оторвано: ','oderwane: ','torn off: '],['пришито: ','przyszyte: ','sewn on: '],
+['Травмы','Obrażenia','Injuries'],['Травм нет','Brak obrażeń','No injuries'],['лёгкая','lekka','minor'],['средняя','średnia','moderate'],['тяжёлая','ciężka','serious'],['угроза жизни','zagrożenie życia','life-threatening'],
+['Мачете плашмя','Maczeta płazem','Machete (flat side)'],['Мачете','Maczeta','Machete'],['рубленая рана','rana rąbana','chop wound'],
  ['Пинцет в ране — веди глубже, к пуле','Pęseta w ranie — prowadź głębiej, do pocisku','Tweezers in the wound — go deeper, to the bullet'],['В этой ране пули нет','W tej ranie nie ma pocisku','No bullet in this wound'],
  ['Пуля выскользнула — тяни медленнее','Pocisk się wyślizgnął — ciągnij wolniej','The bullet slipped — pull slower'],
  ['Рана зашита — обрежь нить ножницами (левый курок)','Rana zszyta — przetnij nić nożyczkami (lewy spust)','Wound closed — cut the thread with the scissors (left trigger)'],['Стежок ','Szew ','Stitch '],
@@ -547,7 +585,7 @@ const RU=new V3(),TV=new V3(),SDIR=new V3(),BK=new V3(),PP1=new V3(),PHIT=new V3
 function runit(){do{RU.set(rnd(-1,1),rnd(-1,1),rnd(-1,1))}while(RU.lengthSq()>1||RU.lengthSq()<.02);return RU.normalize()}
 let EMIT_SRC=null,DSF=0;
 let EVY=1e9,EVA=null;
-function emit(p,v,r,vol,k){const V=vol||4.18879*r*r*r;let o;if(PT.length>=MAXP){o=PT[ri(PT.length)];o.p.copy(p);o.v.copy(v);o.r=r;o.vol=V;o.k=k||0;o.t=0;o.src=EMIT_SRC}else{o={p:p.clone(),v:v.clone(),r,vol:V,k:k||0,t:0,src:EMIT_SRC};PT.push(o)}
+function emit(p,v,r,vol,k){if(GFX.blood!==1){if(GFX.blood<1&&Math.random()>=GFX.blood)return;if(GFX.blood>1){r*=1.14;if(vol)vol*=1.5}}const V=vol||4.18879*r*r*r;let o;if(PT.length>=MAXP){o=PT[ri(PT.length)];o.p.copy(p);o.v.copy(v);o.r=r;o.vol=V;o.k=k||0;o.t=0;o.src=EMIT_SRC}else{o={p:p.clone(),v:v.clone(),r,vol:V,k:k||0,t:0,src:EMIT_SRC};PT.push(o)}
  if(EVA)o.v.add(EVA);if(o.v.y>EVY)o.v.y=EVY*(.72+.28*Math.random())}
 // капли, долетевшие до манекена, остаются на его коже (на любом — и на раненом, и на стоящем рядом)
 function dollSph(d){if(d._sf===DSF&&d._sp)return d._sp;let sp=d._sp;if(!sp){sp=d._sp=[];for(const k in d.P){const b=d.P[k].b;for(let i=0;i<b.shapes.length;i++)sp.push({k,b,i,x:0,y:0,z:0,r:b.shapes[i].radius*1.15})}
@@ -936,7 +974,7 @@ function buildAnatomy(d){d.xr=[];d.org={};
    if(ORGM[el.k]){const knot=el.k==='bowel',m=new THREE.Mesh(knot?OKNOT:OSPH,ORGM[el.k]);m.position.set(el.c[0]-c[0],el.c[1]-c[1],el.c[2]-c[2]);
     if(knot)m.scale.set(el.r[0]/1.3,el.r[1]/1.3,el.r[2]/1.3);else m.scale.set(el.r[0]*.95,el.r[1]*.95,el.r[2]*.95);xrAdd(d,P,m);d.org[el.id]=m}
    if(el.k==='bone'){const m=new THREE.Mesh(boneGeo(el.A.distanceTo(el.B),el.r*.72,el.r*1.45),LBONE);placeAB(m,el.A,el.B,c);xrAdd(d,P,m);P.lb={m,el,broken:false}}}}}
-function xrDoll(d){if(d.face)d.face.root.visible=!XR.on;if(d.skin.inner)d.skin.inner.visible=!XR.on;const m=d.skin.mat;m.transparent=XR.on;m.opacity=XR.on?.22:1;m.depthWrite=!XR.on;m.needsUpdate=true;if(d.sl)for(const c of d.sl.caps)if(c){c.transparent=XR.on;c.opacity=XR.on?.22:1;c.depthWrite=!XR.on;c.needsUpdate=true}for(const o of d.xr)o.visible=XR.on}
+function xrDoll(d){if(d.face)d.face.root.visible=!XR.on;if(d.skin.inner)d.skin.inner.visible=!XR.on;const m=d.skin.mat;m.transparent=XR.on;m.opacity=XR.on?.22:1;m.depthWrite=!XR.on;if(m.userData.fl)m.side=XR.on?THREE.FrontSide:THREE.DoubleSide;m.needsUpdate=true;if(d.sl)for(const c of d.sl.caps)if(c){c.transparent=XR.on;c.opacity=XR.on?.22:1;c.depthWrite=!XR.on;c.needsUpdate=true}for(const o of d.xr)o.visible=XR.on}
 function setXr(on){XR.on=on;for(const d of DOLLS)xrDoll(d);$('bXr').classList.toggle('on',on);toast(on?'Рентген включён':'Рентген выключен')}
 function marker(d,part,lp,r,mat){const c=PDM[part].c,m=new THREE.Mesh(OSPH,mat||MARKM);m.scale.setScalar(r);m.position.set(lp.x-c[0],lp.y-c[1],lp.z-c[2]);return xrAdd(d,d.P[part],m)}
 
@@ -1524,7 +1562,7 @@ function bleed0(d,dt){const ph=d.beat%1,sys=ph<.34;
   b.pointToWorldFrame(w.lp,C1);T1.set(C1.x,C1.y,C1.z);b.vectorToWorldFrame(w.ln,C2);T2.set(C2.x,C2.y,C2.z);T3.set(b.velocity.x,b.velocity.y,b.velocity.z);
   const gy=groundY(T1.x,T1.z,T1.y),lying=(d.rag||P.loose)&&T1.y-gy<.22&&T3.lengthSq()<.6&&T2.y<.35;
   // по коже: пятно вокруг раны растёт, от него вниз ползут потоки
-  if(w.R&&w.brad&&I>(w.cut?.00005:.00012)&&(d.alive||d.deadT<60)){w.fT=(w.fT===undefined?(w.cut?rnd(.7,1.5):rnd(1.5,3)):w.fT)-dt;if(w.fT<=0&&I>(w.cut?.00008:.00028)&&(w.nf||0)<(I>.0025?4:2)){w.fT=rnd(2.5,5);w.nf=(w.nf||0)+1;flowFromBlot(d,w,Math.min(.02,I*4))}
+  if(GFX.blood>0&&w.R&&w.brad&&I>(w.cut?.00005:.00012)&&(d.alive||d.deadT<60)){w.fT=(w.fT===undefined?(w.cut?rnd(.7,1.5):rnd(1.5,3)):w.fT)-dt;if(w.fT<=0&&I>(w.cut?.00008:.00028)&&(w.nf||0)<(I>.0025?4:2)){w.fT=rnd(2.5,5);w.nf=(w.nf||0)+1;flowFromBlot(d,w,Math.min(.02,I*4))}
    w.vol=(w.vol||0)+I*dt*2.2;w.gT=(w.gT===undefined?.5:w.gT)-dt;if(w.gT<=0){w.gT=.3;growBlot(d,w)}}
   if(w.art&&(d.alive||w.own||d.agoT>d.deadT)&&I>.0012){
    // артериальная струя: толчками в такт сердцу (в систолу сильнее, в диастолу слабее — давление 120/80);
@@ -2117,7 +2155,7 @@ function grabStand(d){if(d.rag||!d.alive||d.hold||d.conc<=40||!d.legs[0]||!d.leg
  return true}
 // точки хвата: куда тянет рука (T), за какую часть (b) и где эта точка по позе манекена
 function gbHolds(d,out){out.length=0;if(VR.on)for(const c of VR.C)if(c.g&&c.g.d===d&&c.g.con)out.push({T:c.g.T,pa:c.g.con.pivotA,b:c.g.b,con:c.g.con,soft:c.g.soft});
- if(grab&&grab.d===d)out.push({T:hand.position,pa:grab.con.pivotA,b:grab.con.bodyA,con:grab.con,soft:grab.soft});return out}
+ if(grab&&grab.d===d&&!grab.piece)out.push({T:hand.position,pa:grab.con.pivotA,b:grab.con.bodyA,con:grab.con,soft:grab.soft});return out}
 // насколько рука вытянула тело из равновесия: рука и нога сначала просто тянутся (в пределах длины от плеча или бедра),
 // дальше — тянут всё тело; за туловище и голову — сразу. По горизонтали — куда тянут; вниз — ниже, чем достаёт рука; вверх — выше
 function gbPull(d,h,out){const k=PD[h.b.pi].n,P=d.P[k],pa=h.pa;let S,reach,limb=false;
@@ -2263,12 +2301,12 @@ function hitDoll(d,obj,pt,nrm,dir,W,dist,budget){
  if(res&&res.exit){exitP=res.exitP;left=res.left;const ek=res.exitK,eb=d.P[ek].b,le=eb.pointToLocalFrame(new CV(exitP.x,exitP.y,exitP.z)),ld=eb.quaternion.conjugate().vmult(new CV(dir.x,dir.y,dir.z));ld.normalize();
   const w2=addWound(d,ek,le,ld,(SOFTB[ek.slice(0,2)]||.0005)*(rifle?3:1.8)*(W.pel>1?.5:1)+ctx.leak*.2,false,[],true);w2.tau=ctx.leak>.002?420:260;woundMark(d,ek,w2,le,true,rifle);rec.out='навылет';channel(d,name,pt,exitP)}
  else if(res){rec.out='пуля застряла';channel(d,name,pt,res.stopP);const bm=marker(d,res.stopK,toPartLocal(d,res.stopK,res.stopP).add(new V3(...PDM[res.stopK].c)),.0075,LEAD);try{medLodge(d,name,w1,res.stopK,bm,rec)}catch(e){bugLog('lodge',e)}}
- d.shots.unshift(rec);if(d.shots.length>3)d.shots.pop();
+ injAdd(d,rec,name);
  if(d.alive){d.pain=Math.min(100,d.pain+ctx.pain);d.conc-=6*W.dmg}d.blood-=.006*W.dmg;
  if(ctx.die)die(d,ctx.die);
  // голову разрывает от дроби в упор или иногда от автоматной пули (временная полость в замкнутом черепе); пистолет — нет
  if(name==='head'&&!d.headBurst){let burst=false;if(W.pel>1){if(d.shotId!==SHOTID){d.shotId=SHOTID;d.shotHead=0}d.shotHead++;burst=dist<7&&d.shotHead>=(dist<3?2:3)&&Math.random()<.85}else if(rifle)burst=Math.random()<(dist<12?.42:.22);
-  if(burst){headBurst(d,dir,W);rec.org.unshift('череп разрушен')}}
+  if(burst&&GFX.gore){headBurst(d,dir,W);rec.org.unshift('череп разрушен')}}
  gunSpatter(pt,dir,W,exitP,name==='head');
  b.applyImpulse(new CV(dir.x*W.imp*(exitP?.6:1),dir.y*W.imp+W.imp*.1,dir.z*W.imp*(exitP?.6:1)),new CV(pt.x,pt.y,pt.z));wakeDoll(d);
  d.knowsGun=true;d.knowsShot=true;d.fear=1;d.threatP.copy(cam.position);witness(d);faceStartle(d,1);
@@ -2281,8 +2319,8 @@ function hitDoll(d,obj,pt,nrm,dir,W,dist,budget){
    if(!d.legs[0]||!d.legs[1]){toRag(d,dir.x,dir.z,.6);d.st='down';d.downT=rnd(1.5,2.5)}
    else if(!LOWST[d.st]&&!AIOFF){d.lookP=null;if(d.pers.resp==='collapse'||(d.pers.brave<.25&&Math.random()<.5))toSit(d);else if(d.aimed&&d.pers.brave<.5&&Math.random()<.35){d.st='surrender';d.stateT=1.4;d.path=null}else startFlee(d)}}}
  else if(d.alive&&d.st!=='held'&&d.st!=='unconscious'){d.st='down';d.downT=rnd(1,2)}
- if(W.pel>1&&dist<5&&kind!=='pe'&&kind!=='ch'&&kind!=='be'&&kind!=='he'&&!P.loose){P.dmg++;if(P.dmg>=3&&Math.random()<.55)dismember(d,name)}
- if(dist<.7&&!W.nogun)gunSplat();return exitP?{p:exitP,left}:null}
+ if(W.pel>1&&dist<5&&kind!=='pe'&&kind!=='ch'&&kind!=='be'&&kind!=='he'&&!P.loose){P.dmg++;if(P.dmg>=3&&GFX.gore&&Math.random()<.55)dismember(d,name)}
+ if(dist<.7&&!W.nogun&&GFX.blood>0)gunSplat();return exitP?{p:exitP,left}:null}
 function surfAt(p,dir){for(const s of SURF){if(dir&&dir.dot(s.n)>=0)continue;TS.subVectors(p,s.o);if(Math.abs(TS.dot(s.n))>.03)continue;
  const x=TS.dot(s.u)*s.ppm,y=TS.dot(s.v)*s.ppm;if(x>=0&&y>=0&&x<=s.W&&y<=s.H)return{s,x,y}}return null}
 function envHit(h,dir){mist(h.point,.12,true);const sh=surfAt(h.point,dir);if(sh)hole(sh.s,sh.x,sh.y)}
@@ -2332,16 +2370,16 @@ function bullet(o,dir,W){let org=o.clone(),budget=W.pen*(W.pv?rnd(1-W.pv,1+W.pv)
   if(eh)envHit(eh,dir);return}}
 let grab=null;const hand=new CANNON.Body({mass:0,type:CANNON.Body.KINEMATIC});hand.collisionResponse=false;hand.collisionFilterGroup=0;hand.collisionFilterMask=0;world.addBody(hand);
 function grabStart(){if(grab)return;cam.updateMatrixWorld();RC.setFromCamera(CEN,cam);RC.far=4;const h=RC.intersectObjects(DMESH,false)[0];
- if(!h){toast('Подойди ближе к манекену');return}const d=h.object.userData.d,k=h.object.userData.k,b=d.P[k].b;
+ try{if(grabPiece(h))return}catch(e){bugLog('grabPiece',e)}if(!h){toast('Подойди ближе к манекену');return}const d=h.object.userData.d,k=h.object.userData.k,b=d.P[k].b;
  const gst=grabStand(d);if(!gst){if(!d.rag)toRag(d,0,0,0);if(d.alive)d.st='held'}hand.position.set(h.point.x,h.point.y,h.point.z);
  const con=new CANNON.PointToPointConstraint(b,b.pointToLocalFrame(new CV(h.point.x,h.point.y,h.point.z)),hand,new CV(0,0,0),gst?GBSOFT[gbKind(k)][0]:1400);world.addConstraint(con);
  grab={d,con,dist:clamp(h.distance,1.1,2.4),soft:gst};sel=d;$('grab').classList.add('on')}
-function grabUpd(){if(!grab)return;if(grab.soft){const dd=grab.d,st=dd.st;if(dd.rag||!(st==='grabbed'||st==='gsit'||st==='getup')){conForce(grab.con,1400,1400);grab.soft=false;if(dd.rag&&dd.alive&&dd.conc>25&&st!=='unconscious'&&st!=='dead')dd.st='held'}}cam.getWorldDirection(FW);hand.position.set(cam.position.x+FW.x*grab.dist,Math.max(.12,cam.position.y+FW.y*grab.dist),cam.position.z+FW.z*grab.dist);wakeDoll(grab.d)}
-function grabEnd(){if(!grab)return;world.removeConstraint(grab.con);const d=grab.d;if(d.alive&&d.st==='held'&&!VR.C.some(c=>c.g&&c.g.d===d)){d.st='down';d.downT=rnd(1.2,2.2)}grab=null;$('grab').classList.remove('on');if(!isHeld(d)){if(d.rag)throwCap(d,false);else gbRelease(d)}}
+function grabUpd(){if(!grab)return;if(grab.soft){const dd=grab.d,st=dd.st;if(dd.rag||!(st==='grabbed'||st==='gsit'||st==='getup')){conForce(grab.con,1400,1400);grab.soft=false;if(dd.rag&&dd.alive&&dd.conc>25&&st!=='unconscious'&&st!=='dead')dd.st='held'}}cam.getWorldDirection(FW);hand.position.set(cam.position.x+FW.x*grab.dist,Math.max(.12,cam.position.y+FW.y*grab.dist),cam.position.z+FW.z*grab.dist);wakeDoll(grab.d);if(grab.piece)grab.piece.wakeUp()}
+function grabEnd(){if(!grab)return;world.removeConstraint(grab.con);const d=grab.d;if(grab.piece){const pb=grab.con.bodyA;grab=null;$('grab').classList.remove('on');pieceRelease(pb);return}if(d.alive&&d.st==='held'&&!VR.C.some(c=>c.g&&c.g.d===d)){d.st='down';d.downT=rnd(1.2,2.2)}grab=null;$('grab').classList.remove('on');if(!isHeld(d)){if(d.rag)throwCap(d,false);else gbRelease(d)}}
 
 /* ================= звук ================= */
 let AC=null;const NB={};
-function acOut(a){if(!a.__out){const c=a.createDynamicsCompressor();c.threshold.value=-6;c.knee.value=6;c.ratio.value=12;c.attack.value=.003;c.release.value=.15;c.connect(a.destination);a.__out=c}return a.__out}
+function acOut(a){if(!a.__out){const c=a.createDynamicsCompressor();c.threshold.value=-6;c.knee.value=6;c.ratio.value=12;c.attack.value=.003;c.release.value=.15;const mg=a.createGain();mg.gain.value=GFX.vol;c.connect(mg);mg.connect(a.destination);a.__mg=mg;a.__out=c}return a.__out}
 function ac(){if(!AC){try{AC=new(window.AudioContext||window.webkitAudioContext)()}catch(e){}if(AC)try{sndInit(AC)}catch(e){bugLog('snd',e)}}if(AC&&AC.state==='suspended')AC.resume();return AC}
 function noise(dur,f,gain,pw,type){const a=AC;if(!a)return;const key=dur+'_'+pw;let buf=NB[key];
  if(!buf){const n=Math.max(1,a.sampleRate*dur|0);buf=NB[key]=a.createBuffer(1,n,a.sampleRate);const ch=buf.getChannelData(0);for(let i=0;i<n;i++)ch[i]=(Math.random()*2-1)*Math.pow(1-i/n,pw)}
@@ -2366,7 +2404,7 @@ function preset(name){CFG.pos={};applyCfg();if(name==='3'){const W=innerWidth,H=
   if(W-tools.width-tel.width-fs-60>0)CFG.pos.tel=[(16+fs+20+tel.width/2)/W,(10+tel.height/2)/H];else CFG.pos.tel=[(10+tel.width/2)/W,(16+fs+16+tel.height/2)/H]}
  saveCfg();applyCfg()}
 let editing=false,paused=false;
-function openCfg(){paused=true;$('sSens').value=CFG.sens;$('sSize').value=CFG.size;$('sOp').value=CFG.op;$('cAim').checked=CFG.aimFire;$('cRun').checked=CFG.run;$('cTel').checked=CFG.tel!==false;$('cfg').style.display='flex'}
+function openCfg(){paused=true;$('sSens').value=CFG.sens;$('sSize').value=CFG.size;$('sOp').value=CFG.op;$('cAim').checked=CFG.aimFire;$('cRun').checked=CFG.run;$('cTel').checked=CFG.tel!==false;$('cfg').style.display='flex';try{gfxSync()}catch(e){}}
 function closeCfg(){$('cfg').style.display='none';paused=false}
 $('sSens').oninput=e=>{CFG.sens=+e.target.value;saveCfg()};$('sSize').oninput=e=>{CFG.size=+e.target.value;saveCfg();applyCfg()};$('sOp').oninput=e=>{CFG.op=+e.target.value;saveCfg();applyCfg()};
 $('cAim').onchange=e=>{CFG.aimFire=e.target.checked;saveCfg()};$('cRun').onchange=e=>{CFG.run=e.target.checked;saveCfg()};
@@ -2391,8 +2429,8 @@ function plBlocked(x,z,feet){if(Math.abs(x)>ROOM-.35||Math.abs(z)>ROOM-.35)retur
  if(x>5.2+RXO&&x<8.8+RXO&&z>2.5&&z<6.5&&rampH(clamp(x,5.5+RXO,8.5+RXO),z)>feet+.4)return true;return false}
 const K={},joy={x:0,y:0};let lookId=null,lx=0,ly=0,joyId=null,fireId=null,fx=0,fy=0,moved=false;
 function look(dx,dy,k){PL.yaw-=dx*k*CFG.sens;PL.pitch=clamp(PL.pitch-dy*k*CFG.sens,-1.45,1.45)}
-function updPlayer(dt){if(VR.on){vrPlayer(dt);return}let mx=joy.x+((K.KeyD||K.ArrowRight)?1:0)-((K.KeyA||K.ArrowLeft)?1:0),mz=-joy.y+((K.KeyW||K.ArrowUp)?1:0)-((K.KeyS||K.ArrowDown)?1:0);
- const L=Math.hypot(mx,mz);if(L>1){mx/=L;mz/=L}const run=(CFG.run&&Math.hypot(joy.x,joy.y)>.93)||K.ShiftLeft;
+function updPlayer(dt){if(VR.on){vrPlayer(dt);return}let mx=joy.x+GP.mx+((K.KeyD||K.ArrowRight)?1:0)-((K.KeyA||K.ArrowLeft)?1:0),mz=-joy.y+GP.mz+((K.KeyW||K.ArrowUp)?1:0)-((K.KeyS||K.ArrowDown)?1:0);
+ const L=Math.hypot(mx,mz);if(L>1){mx/=L;mz/=L}const run=(CFG.run&&Math.hypot(joy.x,joy.y)>.93)||K.ShiftLeft||GP.run;
  const sy=Math.sin(PL.yaw),cy=Math.cos(PL.yaw),sp=(run?5.2:3.4)*dt,dx=(-sy*mz+cy*mx)*sp,dz=(-cy*mz-sy*mx)*sp;
  if(!plBlocked(PL.x+dx,PL.z+dz,PL.feet)){PL.x+=dx;PL.z+=dz}else if(!plBlocked(PL.x+dx,PL.z,PL.feet))PL.x+=dx;else if(!plBlocked(PL.x,PL.z+dz,PL.feet))PL.z+=dz;
  const g=groundY(PL.x,PL.z,PL.feet);
@@ -2409,7 +2447,7 @@ cvs.addEventListener('pointerup',lookEnd);cvs.addEventListener('pointercancel',l
 document.addEventListener('mousemove',e=>{if(document.pointerLockElement===cvs)look(e.movementX,e.movementY,.0022)});
 document.addEventListener('contextmenu',e=>e.preventDefault());
 addEventListener('keydown',e=>{K[e.code]=1;ac();if(e.code==='Space'){if(!e.repeat){trig=true;trigNew=true}e.preventDefault()}
- if(e.code==='KeyE'&&!e.repeat)grabStart();if(e.code==='KeyX'&&!e.repeat)setXr(!XR.on);if(e.code==='KeyQ')setW(wi+1);if(e.code==='Digit1')setW(0);if(e.code==='Digit2')setW(1);if(e.code==='Digit3')setW(2);if(e.code==='Digit4')setW(3);if(e.code==='Digit5')setW(4);if(e.code==='Digit6')setW(5)});
+ if(e.code==='KeyE'&&!e.repeat)grabStart();if(e.code==='KeyX'&&!e.repeat)setXr(!XR.on);if(e.code==='KeyF'&&!e.repeat&&wi===WI_MAC)macMode();if(e.code==='KeyQ')setW(wi+1);if(e.code==='Digit1')setW(0);if(e.code==='Digit2')setW(1);if(e.code==='Digit3')setW(2);if(e.code==='Digit4')setW(3);if(e.code==='Digit5')setW(4);if(e.code==='Digit6')setW(5)});
 addEventListener('keyup',e=>{K[e.code]=0;if(e.code==='Space'){trig=false;trigNew=false}if(e.code==='KeyE')grabEnd()});
 addEventListener('wheel',e=>setW(wi+(e.deltaY>0?1:-1)),{passive:true});
 const jy=$('joy'),kn=$('knob');
@@ -2446,6 +2484,97 @@ function persTxt(p){return(p.brave>.66?'смелый':p.brave<.33?'трусли�
 let telT=0,aimT=0;const tb=$('tb');
 function pickAim(){if(VR.on&&VR.R&&VR.R.src){aimRay(VRp,VRd);RC.set(VRp,VRd)}else{cam.updateMatrixWorld();RC.setFromCamera(CEN,cam)}RC.far=30;const h=RC.intersectObjects(DMESH,false)[0],e=RC.intersectObjects(ENV,false)[0];
  if(h&&(!e||h.distance<e.distance)){AIM=h.object.userData.d;AIMD=h.distance;sel=AIM}else{AIM=null;AIMD=99}}
+// ================= v64: медицинский экран =================
+// Предложение из Discord: видеть все травмы (раньше в панели было только 3 последние) и цвет по тяжести:
+// зелёный — лёгкая, жёлтый — средняя, оранжевый — тяжёлая, красный — угроза жизни.
+// В панели манекена — маленькая 3D-фигура: раненые части светятся цветом самой тяжёлой травмы, кровоточащие — пульсируют,
+// оторванные — красный каркас. Под фигурой — полный список с прокруткой. В шлеме — своя страница панели на запястье,
+// фигура там настоящая объёмная модель над панелью.
+const INJMAX=40,INJC=['#43c463','#e9c440','#f08a32','#e5484d'],INJN=['лёгкая','средняя','тяжёлая','угроза жизни'];
+function injAdd(d,rec,k){rec.k=k;d.shots.unshift(rec);if(d.shots.length>INJMAX)d.shots.pop()}
+const INJR3=/сердц|аорт|артери|полая вена|яремная вена|мозг|череп|позвон|гематома(?! век)|оторван|отрублен|разрыв печени|разрыв селез|лёгкое|асфикси/,
+ INJR2=/перелом|печен|почк|селез|кишеч|желуд|пуля застряла|рубленая|сотрясен|удушен|сдавлен|кость|кости|рёбр|ключиц|челюст|глаз/,
+ INJR1=/навылет|рана|сильный удар|удар в |удар по |перехватило|выбит|ушиб|гематома век|кровоизлиян/;
+function injSev(r){const s=((r.org||[]).join(' | ')+' | '+(r.out||'')).toLowerCase().replace(/перелом (носа|пальцев)/g,'ушиб');
+ return INJR3.test(s)?3:INJR2.test(s)?2:INJR1.test(s)?1:0}
+const RUSK={};for(const k in RUS)RUSK[RUS[k]]=k;
+function injK(r){return r.k||RUSK[r.part]||(r.part==='Шея'?'head':null)}
+function injTxt(r){const org=r.org&&r.org.length?r.org.join(', '):'мягкие ткани',out=r.out?r.out[0].toUpperCase()+r.out.slice(1):'';
+ return [r.w+' → '+String(r.part||'').toLowerCase(),org+(out?'. '+out:'')]}
+const MEDF={d:null,map:{},gone:{},bl:{},cnt:[0,0,0,0],sig:'',lh:'',nh:'',fig2:null,figV:null,r2:null,sc2:null,cam2:null,t:0,vis2:false,vmore:false};
+const MEDHC=new THREE.Color(0x7d8fa6),MEDHE=new THREE.Color(0x0d1218);
+// фигура — те же части, что у манекена (центры и размеры из PD), стоя, руки вдоль тела; кисти и стопы — к предплечьям и голеням
+function medFig(){const g=new THREE.Group(),M={},geo=new THREE.SphereGeometry(1,22,16);g.userData.M=M;
+ for(const p of PD){const m=M[p.n]=new THREE.MeshLambertMaterial({color:MEDHC,emissive:MEDHE,transparent:true,opacity:.94});
+  const add=(x,y,z,sx,sy,sz)=>{const o=new THREE.Mesh(geo,m);o.position.set(x,y,z);o.scale.set(sx,sy,sz);g.add(o)};
+  add(p.c[0],p.c[1],p.c[2],p.h[0],p.h[1],p.h[2]);
+  if(p.vis==='arm')add(p.c[0],p.c[1]-p.h[1]-.035,0,.038,.05,.03);
+  if(p.vis==='leg')add(p.c[0],.035,.045,.045,.035,.095)}
+ return g}
+function medPaint(){for(const g of [MEDF.fig2,MEDF.figV]){if(!g)continue;const M=g.userData.M;
+ for(const k in M){const m=M[k],s=MEDF.map[k];m.wireframe=!!MEDF.gone[k];
+  if(MEDF.gone[k]){m.color.set(INJC[3]);m.emissive.set(INJC[3]);m.emissiveIntensity=.25;m.opacity=.5}
+  else if(s===undefined){m.color.copy(MEDHC);m.emissive.copy(MEDHE);m.emissiveIntensity=1;m.opacity=.94}
+  else{m.color.set(INJC[s]);m.emissive.set(INJC[s]);m.emissiveIntensity=.3;m.opacity=1}}}}
+// кровоточащие части пульсируют
+function medPulse(t){const a=.3+.5*(.5+.5*Math.sin(t*6.5));for(const g of [MEDF.fig2,MEDF.figV]){if(!g)continue;const M=g.userData.M;
+ for(const k in M)if(MEDF.bl[k]&&!MEDF.gone[k]&&MEDF.map[k]!==undefined)M[k].emissiveIntensity=a}}
+// раз в 0.2 с из панели телеметрии: карта частей, счёт по цветам, список (меняем, только если изменился — прокрутка не сбивается)
+function medUpd(d){const box=$('med');if(!d){if(box)box.style.display='none';MEDF.d=null;MEDF.vis2=false;return}
+ if(MEDF.d!==d){MEDF.d=d;MEDF.lh='';VR.medS=0;const L0=$('medL');if(L0)L0.scrollTop=0}
+ const map={},cnt=[0,0,0,0];for(const r of d.shots){const s=injSev(r),k=injK(r);cnt[s]++;if(k&&(map[k]===undefined||s>map[k]))map[k]=s}
+ const gone={},bl={},ck=d.capK===undefined?1:d.capK;for(const p of PD)if(d.P[p.n]&&d.P[p.n].loose)gone[p.n]=1;
+ for(const w of d.wounds){if(w.own||!w.part)continue;if(w.rate*d.press*ck>.0008)bl[w.part]=1}
+ MEDF.map=map;MEDF.gone=gone;MEDF.bl=bl;MEDF.cnt=cnt;
+ const sig=JSON.stringify([map,gone]);if(sig!==MEDF.sig){MEDF.sig=sig;medPaint()}
+ if(!box)return;box.style.display='block';MEDF.vis2=true;const L1=$('medL');if(L1&&!L1._mi){L1._mi=1;L1.addEventListener('scroll',medMore,{passive:true})}
+ let h='';for(const r of d.shots){const s=injSev(r),T=injTxt(r);h+='<div class="mi"><i style="background:'+INJC[s]+'"></i><div><b>'+T[0]+'</b><span>'+T[1]+'</span></div></div>'}
+ if(!h)h='<div class="none">Травм нет</div>';
+ if(LANG+'|'+h!==MEDF.lh){MEDF.lh=LANG+'|'+h;$('medL').innerHTML=tr(h)}
+ let n='';for(let i=0;i<4;i++)if(cnt[i])n+='<i style="background:'+INJC[i]+'"></i>'+cnt[i];
+ if(n!==MEDF.nh){MEDF.nh=n;$('medN').innerHTML=n}
+ medMore()}
+function medMore(){const L=$('medL');if(L)L.classList.toggle('more',L.scrollHeight-L.scrollTop-L.clientHeight>4)}
+// фигура на экране планшета/ПК — свой маленький рендер, крутится
+function med2D(t){requestAnimationFrame(med2D);if(!MEDF.vis2||VR.on||document.hidden)return;const c=$('medFig');if(!c)return;
+ if(!MEDF.r2){try{MEDF.r2=new THREE.WebGLRenderer({canvas:c,alpha:true,antialias:true,powerPreference:'low-power'});MEDF.r2.setPixelRatio(Math.min(2,window.devicePixelRatio||1));
+   const S=MEDF.sc2=new THREE.Scene();S.add(new THREE.HemisphereLight(0xdfe8f5,0x30363e,.95));const dl=new THREE.DirectionalLight(0xffffff,.7);dl.position.set(1.5,2.5,3);S.add(dl);
+   MEDF.fig2=medFig();S.add(MEDF.fig2);MEDF.fig2.rotation.y=.5;MEDF.cam2=new THREE.PerspectiveCamera(24,.5,.1,30);MEDF.sig='';medPaint();MEDF.sig=JSON.stringify([MEDF.map,MEDF.gone])}
+  catch(e){bugLog('medR',e);MEDF.vis2=false;MEDF.r2=null;return}}
+ const w=c.clientWidth,h=c.clientHeight;if(!w||!h)return;
+ if(MEDF.w2!==w||MEDF.h2!==h){MEDF.w2=w;MEDF.h2=h;MEDF.r2.setSize(w,h,false);const C=MEDF.cam2;C.aspect=w/h;const dist=.95/Math.tan(C.fov*Math.PI/360);C.position.set(0,.88,dist);C.lookAt(0,.88,0);C.updateProjectionMatrix()}
+ const dt=Math.min(.05,Math.max(0,(t-(MEDF.t||t))/1000));MEDF.t=t;MEDF.fig2.rotation.y+=dt*.7;medPulse(t/1000);MEDF.r2.render(MEDF.sc2,MEDF.cam2)}
+requestAnimationFrame(med2D);
+// в шлеме: объёмная фигура над левой частью страницы «Травмы» на запястье
+function medVR(dt){const show=!!(VR.on&&VR.page==='med'&&VP.m.parent&&VP.m.visible&&MEDF.d);
+ if(show&&!MEDF.figV){const g=MEDF.figV=medFig(),s=.118/1.75;g.scale.setScalar(s);g.position.set((104/VPW-.5)*.19,(.5-345/VPH)*.19*VPH/VPW-.88*s,.022);g.rotation.y=.5;VP.m.add(g);MEDF.sig='';medPaint();MEDF.sig=JSON.stringify([MEDF.map,MEDF.gone])}
+ if(MEDF.figV){MEDF.figV.visible=show;if(show){MEDF.figV.rotation.y+=(dt||1/72)*.7;medPulse(performance.now()/1000)}}}
+// страница «Травмы» на панели: подложка под фигуру слева, список справа, ▲▼, легенда цветов
+function medPanel(g,F,y0){const d=MEDF.d,W=VPW;let y=Math.max(y0,150);
+ g.font='800 24px '+F;g.fillStyle='#fff';g.fillText(tr('Травмы')+(d?'  #'+String(d.id).padStart(2,'0'):''),24,y);
+ if(d){let x=W-24;g.font='700 18px '+F;for(let i=3;i>=0;i--){const c=MEDF.cnt[i];if(!c)continue;const t=String(c),tw=g.measureText(t).width;x-=tw;g.fillStyle='#eef1f4';g.fillText(t,x,y);x-=18;g.fillStyle=INJC[i];g.beginPath();g.arc(x+7,y-7,7,0,TAU);g.fill();x-=12}}
+ y+=18;const top=y,bot=516,lx=204,lw=W-24-lx;
+ g.fillStyle='rgba(255,255,255,.05)';g.beginPath();rrect(g,18,top,172,bot-top,14);g.fill();
+ if(!d){g.font='18px '+F;g.fillStyle='#a3abb5';let yy=top+26;for(const t of vrWrap(g,tr('Наведи прицел на манекен'),lw)){g.fillText(t,lx,yy);yy+=23}MEDF.vmore=false;return}
+ const L=d.shots;VR.medS=Math.max(0,Math.min(VR.medS||0,Math.max(0,L.length-1)));let yy=top+22,last=VR.medS-1;
+ if(!L.length){g.font='18px '+F;g.fillStyle='#a3abb5';g.fillText(tr('Травм нет'),lx,yy)}
+ for(let i=VR.medS;i<L.length;i++){const r=L[i],s=injSev(r),T=injTxt(r);g.font='700 17px '+F;const l1=vrWrap(g,tr(T[0]),lw-20);g.font='16px '+F;const l2=vrWrap(g,tr(T[1]),lw-20);
+  const hh=(l1.length+l2.length-1)*20+6;if(yy+hh>bot-22&&i>VR.medS)break;
+  g.fillStyle=INJC[s];g.beginPath();g.arc(lx+7,yy-6,7,0,TAU);g.fill();
+  g.font='700 17px '+F;g.fillStyle='#eef1f4';for(const t of l1){g.fillText(t,lx+20,yy);yy+=20}
+  g.font='16px '+F;g.fillStyle='#a9b2bc';for(const t of l2){g.fillText(t,lx+20,yy);yy+=20}yy+=10;last=i}
+ MEDF.vmore=last<L.length-1;
+ if(L.length){g.font='600 15px '+F;g.fillStyle='#7d848c';g.fillText((VR.medS+1)+'–'+(last+1)+' / '+L.length,lx,bot+2)}
+ g.font='15px '+F;for(let j=0;j<4;j++){const x=24+(j%2)*240,yv=742+Math.floor(j/2)*26;g.fillStyle=INJC[j];g.beginPath();g.arc(x+7,yv-5,7,0,TAU);g.fill();g.fillStyle='#a3abb5';g.fillText(tr(INJN[j]),x+22,yv)}}
+// главная страница: строка «Травмы» — нажми, чтобы открыть страницу травм
+function medRow(g,F){const d=MEDF.d,y=WPN[wi].med?342:446,h=40,i=VR.btns.length;
+ VR.btns.push({t:'',x:18,y,w:VPW-36,h,fn:()=>{VR.page='med';VR.medS=0},own:true});
+ const hv=VR.hover===i;g.fillStyle=hv?'#ff8a52':'#262a31';g.beginPath();rrect(g,18,y,VPW-36,h,10);g.fill();
+ if(hv){g.strokeStyle='#fff';g.lineWidth=3;g.beginPath();rrect(g,19.5,y+1.5,VPW-39,h-3,9);g.stroke()}
+ g.font='700 18px '+F;g.fillStyle='#fff';g.fillText(tr('Травмы')+': '+d.shots.length,32,y+27);
+ let x=VPW-60;g.font='700 17px '+F;for(let j=3;j>=0;j--){const c=MEDF.cnt[j];if(!c)continue;const t=String(c),tw=g.measureText(t).width;x-=tw;g.fillStyle='#eef1f4';g.fillText(t,x,y+27);x-=18;g.fillStyle=INJC[j];g.beginPath();g.arc(x+7,y+21,7,0,TAU);g.fill();x-=12}
+ g.fillStyle='#fff';g.font='800 20px '+F;g.fillText('▸',VPW-46,y+27)}
+
 function tel0(){const d=sel&&DOLLS.indexOf(sel)>=0?sel:null;let h='';
  if(!d){const al=DOLLS.filter(d=>d.alive).length;h='<div class="h2">Наведи прицел на манекен</div><div class="lab">Живых <em>'+al+'</em></div><div class="lab">Мёртвых <em>'+(DOLLS.length-al)+'</em></div>'}
  else{const unc=d.conc<=22||d.st==='unconscious',cs=d.alive?(unc?'БЕЗ СОЗНАНИЯ':'В СОЗНАНИИ'):'МЁРТВ',st=d.alive&&!unc?' / '+ST[d.st]:'';
@@ -2464,9 +2593,8 @@ function tel0(){const d=sel&&DOLLS.indexOf(sel)>=0?sel:null;let h='';
   for(const w of d.wounds)for(const t of w.tags)if(t.indexOf('оторвано')===0)h+='<div class="wl">'+t[0].toUpperCase()+t.slice(1)+'</div>';
   if(d.alive&&!unc){h+='<div class="lab">Страх <em>'+Math.round(d.fear*100)+'%</em></div><div class="bar f"><i style="width:'+Math.round(d.fear*100)+'%"></i></div>'+(d.emo?'<div class="lab">Эмоция <em>'+d.emo+'</em></div>':'')+'<div class="ai">'+persTxt(d.pers)+'</div>';
    const fl=[];if(AIOFF)fl.push('ИИ отключён');if(d.seesPl)fl.push(d.aimed?'видит, что ты целишься':'видит тебя');if(d.knowsShot)fl.push('знает, что хлопок — выстрел');else if(d.knowsGun)fl.push('знает, что ты опасен');if(d.bodyE&&BODYST[d.st])fl.push('нашёл тело');if(fl.length)h+='<div class="ai">'+fl.join(' · ')+'</div>'}
-  for(const r of d.shots)h+='<div class="sh">'+r.w+' → '+r.part.toLowerCase()+': '+(r.org.length?r.org.join(', '):'мягкие ткани')+'. '+r.out[0].toUpperCase()+r.out.slice(1)+'</div>';
   if(!d.alive)h+='<div class="why">Причина: '+d.why+'</div>'}
- tb.innerHTML=tr(h)}
+ tb.innerHTML=tr(h);try{medUpd(d)}catch(e){bugLog('med64',e)}}
 
 /* ================= VR: шлем (WebXR) =================
    Голова — камера. Правый контроллер — оружие (курок — огонь, лазерный прицел, отдача в руку).
@@ -2488,7 +2616,7 @@ function vrTurn(a){const hx=cam.position.x,hz=cam.position.z;VRm.makeTranslation
 function aimRay(o,d){if(VR.on&&VR.R&&VR.R.src){VR.R.ray.updateMatrixWorld(true);if(VR.muz&&LZ.parent===VR.R.ray)o.copy(VR.muz).applyMatrix4(VR.R.ray.matrixWorld);else o.setFromMatrixPosition(VR.R.ray.matrixWorld);d.set(0,0,-1);if(VR.mq&&!WPN[wi].nogun)d.applyQuaternion(VR.mq);d.transformDirection(VR.R.ray.matrixWorld);return}cam.updateMatrixWorld();o.copy(cam.position);cam.getWorldDirection(d)}
 function aimDir(v){if(VR.on&&VR.R&&VR.R.src){VR.R.ray.updateMatrixWorld(true);v.set(0,0,-1);if(VR.mq&&!WPN[wi].nogun)v.applyQuaternion(VR.mq);return v.transformDirection(VR.R.ray.matrixWorld)}return cam.getWorldDirection(v)}
 function vrPulse(c,s,ms){if(!VRC.hap)return;try{const h=c&&c.src&&c.src.gamepad&&c.src.gamepad.hapticActuators&&c.src.gamepad.hapticActuators[0];if(h&&h.pulse)h.pulse(s,ms)}catch(e){}}
-function isHeld(d){return(grab&&grab.d===d)||VR.C.some(c=>c.g&&c.g.d===d)||(VR.knReady&&KN.s&&KN.s.d===d)}
+function isHeld(d){return(grab&&grab.d===d&&!grab.piece)||VR.C.some(c=>c.g&&c.g.d===d)||(VR.knReady&&KN.s&&KN.s.d===d)}
 
 // модель левой руки (контроллер) — подсвечивается, когда рядом есть за что схватиться
 const HMAT=new THREE.MeshStandardMaterial({color:0x3a3f46,roughness:.6,metalness:.1}),HMATH=new THREE.MeshStandardMaterial({color:0xe2622d,roughness:.5,emissive:0x5a1e08});
@@ -2812,7 +2940,7 @@ function vrSave(){try{localStorage.setItem('ragdollLab.vr.v1',JSON.stringify(VRC
 const VRLEG=['Курок — огонь · хват — схватить (можно издалека)','Левый стик — ходьба · правый — поворот, вверх/вниз — рост','A — оружие · B — замедление (держи: сброс)','X — манекен · Y — панель (держи: убрать кровь)','Стик нажать: левый — рентген, правый — сидя/стоя','Кнопки панели: наведи луч и нажми курок'],
  VRLEGL=['Курок — огонь · хват — схватить (можно издалека)','Правый стик — ходьба · левый — поворот, вверх/вниз — рост','X — оружие · Y — замедление (держи: сброс)','A — манекен · B — панель (держи: убрать кровь)','Стик нажать: правый — рентген, левый — сидя/стоя','Кнопки панели: наведи луч и нажми курок'];
 // кнопки панели (нажимаются лучом руки с оружием и курком): главная страница и страница настроек
-function vrBtns(){const B=[],add=(t,x,y,w,h,fn,on)=>B.push({t,x,y,w,h,fn,on});
+function vrBtns(){const B=[],add=(t,x,y,w,h,fn,on)=>B.push({t,x,y,w,h,fn,on});if(VR.page==='gfx')return gfxVrBtns(B,add);if(VR.page==='med'){add('▲',204,528,140,48,()=>{VR.medS=Math.max(0,(VR.medS||0)-1)});add('▼',354,528,140,48,()=>{if(MEDF.vmore)VR.medS=(VR.medS||0)+1});add('Назад',18,600,VPW-36,50,()=>{VR.page='main'});return B}
  if(VR.page==='cfg'){let y=170;const row=(lab,opts)=>{B.push({lab,y});const n=opts.length,w=(VPW-36-(n-1)*10)/n;opts.forEach((o,i)=>add(o[0],18+i*(w+10),y+10,w,44,o[1],o[2]));y+=66};
   row('Поворот',[['Рывком 30°',()=>{VRC.turn=30;vrSave()},()=>VRC.turn===30],['Рывком 45°',()=>{VRC.turn=45;vrSave()},()=>VRC.turn===45],['Плавно',()=>{VRC.turn=0;vrSave()},()=>VRC.turn===0]]);
   row('Скорость ходьбы',[['Медленно',()=>{VRC.speed=.6;vrSave()},()=>VRC.speed<.8],['Обычно',()=>{VRC.speed=1;vrSave()},()=>VRC.speed>=.8&&VRC.speed<=1.2],['Быстро',()=>{VRC.speed=1.5;vrSave()},()=>VRC.speed>1.2]]);
@@ -2823,7 +2951,7 @@ function vrBtns(){const B=[],add=(t,x,y,w,h,fn,on)=>B.push({t,x,y,w,h,fn,on});
   row('Наклон руки',[['0°',()=>handTilt(0),()=>VRC.htilt===0],['15°',()=>handTilt(15),()=>VRC.htilt===15],['30°',()=>handTilt(30),()=>VRC.htilt===30],['45°',()=>handTilt(45),()=>VRC.htilt===45]]);
   row('Хват ножа',[['Обратный',()=>knifeGrip(1),()=>KN.grip===1],['Прямой',()=>knifeGrip(2),()=>KN.grip===2],['Вперёд',()=>knifeGrip(3),()=>KN.grip===3]]);
   row('Язык',[['Русский',()=>setLang('ru'),()=>LANG==='ru'],['Polski',()=>setLang('pl'),()=>LANG==='pl'],['English',()=>setLang('en'),()=>LANG==='en']]);
-  add('Назад',18,y+8,VPW-36,50,()=>{VR.page='main'});return B}
+  add('Графика',18,y+8,(VPW-46)/2,50,()=>{VR.page='gfx'});add('Назад',28+(VPW-46)/2,y+8,(VPW-46)/2,50,()=>{VR.page='main'});return B}
  const L=[['Сброс',()=>resetScene()],['Сидя',()=>vrSeat(!VR.sit),()=>VR.sit],['+ Манекен',()=>{spawnDoll();toast('+ Манекен')}],
   ['Убрать кровь',()=>{cleanBlood();toast('Кровь убрана')}],['Замедление',()=>vrSlow(),()=>TSC<1],['Рентген',()=>setXr(!XR.on),()=>XR.on],
   [()=>WPN[wi].n,()=>{setW(wi+1);toast(WPN[wi].n)}],['Настройки',()=>{VR.page='cfg'}],['Выйти из VR',()=>{if(VR.ses)VR.ses.end()}]];
@@ -2973,7 +3101,7 @@ function vrPlayer(dt){kick=Math.max(0,kick-dt*kick*9-dt*.02);const h=cam.positio
  if(VR.dist>.72){VR.dist=0;PL.stp=(PL.stp||0)+1;const wet=playerStep(),qt=(VR.hs||0)<1.05||cam.position.y-PL.feet<1.2;T4.set(PL.x,PL.feet,PL.z);sfxStep(T4,qt?.6:1.3,wet,qt?.28:.5);heardPlayer(false,qt)}
  if(hmT>VR.hm+.001&&VR.R)vrPulse(VR.R,.3,22);VR.hm=hmT;
  if(VR.msgT>0){VR.msgT-=dt;if(VR.msgT<=0)vrPanel()}
- gunPre();handsUpd(dt);vrHands();vrLaser()}
+ gunPre();handsUpd(dt);vrHands();vrLaser();try{medVR(dt)}catch(e){bugLog('medVR',e)}}
 // Режим сидя: мир опускается так, чтобы глаза оказались на высоте стоящего человека (~1,62 м). Пол тогда не достать рукой — хватай издалека.
 function vrSeat(on,quiet){VR.sit=!!on;try{localStorage.setItem('ragdollLab.vrSit',on?'1':'0')}catch(e){}if(!VR.on)return;let ns=0;
  if(on){const H=cam.position.y-VR.M.elements[13]+VR.eye+VR.seat;ns=VR.local?.45:clamp(1.62-H,.15,.95)}const d=ns-VR.seat;VR.seat=ns;VR.seat0=ns;if(Math.abs(d)>1e-4)vrMove(0,d,0);if(!quiet)toast(on?'Режим сидя':'Режим стоя');vrPanel()}
@@ -2984,11 +3112,11 @@ function rrect(g,x,y,w,h,r){g.moveTo(x+r,y);g.arcTo(x+w,y,x+w,y+h,r);g.arcTo(x+w
 function vrWrap(g,s,w){const out=[];let cur='';for(const wd of s.split(' ')){const t=cur?cur+' '+wd:wd;if(cur&&g.measureText(t).width>w){out.push(cur);cur=wd}else cur=t}if(cur)out.push(cur);return out}
 function vrPanel(){if(!VR.on)return;const g=VP.g,W=VPW,H=VPH,F='system-ui,-apple-system,"Segoe UI",Roboto,sans-serif';g.clearRect(0,0,W,H);
  g.fillStyle='#121418';g.beginPath();rrect(g,0,0,W,H,26);g.fill();g.fillStyle='#e2622d';g.fillRect(0,26,7,H-52);
- let y=46;g.fillStyle='#eef1f4';g.font='800 27px '+F;g.fillText('WINCE v62',24,y);if(BUGS.length){g.font='600 14px '+F;g.fillStyle='#7d848c';g.fillText('! '+bugN+' '+BUGS[BUGS.length-1].t,190,y-6);g.fillStyle='#eef1f4'}g.font='600 21px '+F;g.fillStyle='#ffcdb9';g.fillText(tr(WPN[wi].n)+(WPN[wi].melee&&VR.knReady?' · '+tr(KGN[KN.grip]).toLowerCase():'')+(TSC<1?' · '+tr('замедление'):''),24,y+28);if(VR.page!=='cfg'){try{vrStats(g,F,y)}catch(e){}y+=110}else y+=66;
+ let y=46;g.fillStyle='#eef1f4';g.font='800 27px '+F;g.fillText('WINCE v65',24,y);if(BUGS.length){g.font='600 14px '+F;g.fillStyle='#7d848c';g.fillText('! '+bugN+' '+BUGS[BUGS.length-1].t,190,y-6);g.fillStyle='#eef1f4'}g.font='600 21px '+F;g.fillStyle='#ffcdb9';g.fillText(tr(WPN[wi].n)+(WPN[wi].melee&&VR.knReady?' · '+tr(KGN[KN.grip]).toLowerCase():'')+(TSC<1?' · '+tr('замедление'):''),24,y+28);if(VR.page!=='cfg'&&VR.page!=='gfx'){try{vrStats(g,F,y)}catch(e){}y+=110}else y+=66;
  if(VR.msgT>0&&VR.msg){g.font='700 18px '+F;const ls=vrWrap(g,VR.msg,W-64).slice(0,2);g.fillStyle='rgba(226,98,45,.92)';g.beginPath();rrect(g,18,y-25,W-36,14+ls.length*23,10);g.fill();g.fillStyle='#fff';for(const t of ls){g.fillText(t,30,y);y+=23}y+=18}
  // телеметрия — по строкам панели на экране: подпись слева, значение справа, полоски, пометки
- VR.btns=vrBtns();const cfg=VR.page==='cfg';if(cfg){g.font='800 24px '+F;g.fillStyle='#fff';g.fillText(tr('Настройки VR'),24,Math.max(y,140))}
- const lim=cfg?0:(WPN[wi].med?384:482);for(const el of (cfg?[]:tb.children)){if(y>lim)break;const cl=el.className||'';
+ VR.btns=vrBtns();const cfg=VR.page==='cfg'||VR.page==='gfx',med=VR.page==='med';if(med)try{medPanel(g,F,y)}catch(e){bugLog('medP',e)}if(cfg){g.font='800 24px '+F;g.fillStyle='#fff';g.fillText(tr(VR.page==='gfx'?'Графика':'Настройки VR'),24,Math.max(y,140))}
+ const lim=cfg||med?0:(WPN[wi].med?(MEDF.d?334:384):(MEDF.d?438:482));for(const el of (cfg||med?[]:tb.children)){if(y>lim)break;const cl=el.className||'';
   if(cl==='row'){const id=el.querySelector('.id'),st=el.querySelector('.st'),it=id?id.textContent:'';g.font='800 25px '+F;g.fillStyle='#fff';g.fillText(it,24,y);const iw=g.measureText(it).width+12;
    g.font='700 18px '+F;g.fillStyle='#ffcdb9';for(const t of vrWrap(g,st?st.textContent.replace(/^\s*\/\s*/,''):'',W-48-iw)){g.fillText(t,24+iw,y);y+=23}y+=6;continue}
   if(cl==='lab'){const em=el.querySelector('em');let lab='';for(const n of el.childNodes)if(n.nodeType===3)lab+=n.nodeValue;g.font='19px '+F;g.fillStyle='#a3abb5';g.fillText(lab.trim(),24,y);
@@ -2997,27 +3125,28 @@ function vrPanel(){if(!VR.on)return;const g=VP.g,W=VPW,H=VPH,F='system-ui,-apple
    g.fillStyle=/\bc\b/.test(cl)?'#d9dee4':/\bm\b/.test(cl)?'#e2a33d':/\bf\b/.test(cl)?'#a98bff':'#c0141c';g.fillRect(24,y-16,(W-48)*clamp(pc,0,100)/100,6);y+=9;continue}
   const col=cl==='ai'?'#c3d4ff':cl==='wl'?'#ffb1a3':cl==='sh'?'#ffc6ba':cl==='why'?'#ffd9cf':'#a3abb5';g.font=(cl==='wl'||cl==='why'?'600 ':'')+'18px '+F;g.fillStyle=col;
   for(const t of vrWrap(g,el.textContent,W-48)){if(y>lim)break;g.fillText(t,24,y);y+=23}}
+ if(!cfg&&!med&&MEDF.d)try{medRow(g,F)}catch(e){bugLog('medRow',e)}
  // кнопки и подписи строк настроек
- for(let i=0;i<VR.btns.length;i++){const B=VR.btns[i];if(B.lab){g.font='600 17px '+F;g.fillStyle='#a3abb5';g.fillText(tr(B.lab),20,B.y+2);continue}
+ for(let i=0;i<VR.btns.length;i++){const B=VR.btns[i];if(B.own)continue;if(B.lab){g.font='600 17px '+F;g.fillStyle='#a3abb5';g.fillText(tr(B.lab),20,B.y+2);continue}
   const on=B.on&&B.on(),hv=VR.hover===i;g.fillStyle=hv?'#ff8a52':on?'rgba(226,98,45,.9)':'#262a31';g.beginPath();rrect(g,B.x,B.y,B.w,B.h,10);g.fill();
   if(hv){g.strokeStyle='#fff';g.lineWidth=3;g.beginPath();rrect(g,B.x+1.5,B.y+1.5,B.w-3,B.h-3,9);g.stroke()}
   g.font='700 18px '+F;g.fillStyle='#fff';const t=tr(typeof B.t==='function'?B.t():B.t)+(on?' ✓':'');let tw=g.measureText(t).width;if(tw>B.w-12){g.font='700 15px '+F;tw=g.measureText(t).width}g.fillText(t,B.x+(B.w-tw)/2,B.y+B.h/2+6)}
- if(!cfg){g.font='15px '+F;g.fillStyle='#a3abb5';let ly=748;const LG=(VRC.lefty?VRLEGL:VRLEG).slice();if(WPN[wi].melee)LG[0]='Курок — сменить хват ножа · хват — схватить';else if(WPN[wi].hand)LG[0]='Хват — кулак или схватить · обе руки на шее + оба курка — душить';else if(WPN[wi].blunt)LG[0]='Молоток в руке — бей им · левый хват — схватить';else if(WPN[wi].blade)LG[0]='Мачете — руби или пили: води клинком в разрезе и дави · левый хват — держать';else if(WPN[wi].med)LG[0]=medLegend();else if(wi===2)LG[0]='Курок — огонь · помпа: держи цевьё, жми курок и дёрни назад-вперёд';else LG[0]='Курок — огонь · вторая рука у цевья — держать двумя руками';for(const t of LG){g.fillText(tr(t),24,ly);ly+=21}}VP.tex.needsUpdate=true}
+ if(!cfg&&!med){g.font='15px '+F;g.fillStyle='#a3abb5';let ly=748;const LG=(VRC.lefty?VRLEGL:VRLEG).slice();if(WPN[wi].melee)LG[0]='Курок — сменить хват ножа · хват — схватить';else if(WPN[wi].hand)LG[0]='Хват — кулак или схватить · обе руки на шее + оба курка — душить';else if(WPN[wi].blunt)LG[0]='Молоток в руке — бей им · левый хват — схватить';else if(WPN[wi].blade)LG[0]='Мачете — руби, пили или коли остриём · левый хват — держать';else if(WPN[wi].med)LG[0]=medLegend();else if(wi===2)LG[0]='Курок — огонь · помпа: держи цевьё, жми курок и дёрни назад-вперёд';else LG[0]='Курок — огонь · вторая рука у цевья — держать двумя руками';for(const t of LG){g.fillText(tr(t),24,ly);ly+=21}}VP.tex.needsUpdate=true}
 
 // вход в VR и выход
 async function vrStart(){ac();if(!navigator.xr)throw new Error('noxr');let ses=null;
  try{ses=await navigator.xr.requestSession('immersive-vr',{requiredFeatures:['local-floor'],optionalFeatures:['bounded-floor']});VR.local=false}
  catch(e){if(e&&e.name==='SecurityError')throw e;ses=await navigator.xr.requestSession('immersive-vr');VR.local=true}
- rd.xr.setReferenceSpaceType(VR.local?'local':'local-floor');rd.xr.setFramebufferScaleFactor(.9);
+ rd.xr.setReferenceSpaceType(VR.local?'local':'local-floor');rd.xr.setFramebufferScaleFactor(GFX.vres||.9);
  grabEnd();trig=false;trigNew=false;await rd.xr.setSession(ses);VR.ses=ses;VR.base=rd.xr.getReferenceSpace();
  try{const bl=ses.renderState.baseLayer;if(bl&&'fixedFoveation' in bl)bl.fixedFoveation=1}catch(e){}
  VR.on=true;VR.eye=VR.local?1.6:0;VR.seat=0;VR.hover=-1;VR.page='main';vrRig(PL.x,PL.feet+VR.eye,PL.z,PL.yaw);VR.align=3;VR.lx=VR.lz=null;VR.hm=hmT;
  // в шлеме кадр рисуется дважды (по глазу) — карта теней поменьше
- if(sun.shadow.map){sun.shadow.map.dispose();sun.shadow.map=null}sun.shadow.mapSize.set(1024,1024);
- ses.addEventListener('end',vrEnd);vrAttach();warmShaders();toast(VR.local?'VR: уровень пола не найден — встань прямо':'VR включён');vrPanel()}
+ gfxShadow();
+ ses.addEventListener('end',vrEnd);gfxHz();vrAttach();warmShaders();toast(VR.local?'VR: уровень пола не найден — встань прямо':'VR включён');vrPanel()}
 function vrEnd(){if(!VR.on)return;vrRelease();trig=false;trigNew=false;VR.seat=0;VR.hover=-1;const h=cam.position;PL.x=h.x;PL.z=h.z;cam.getWorldDirection(VRd);PL.yaw=Math.atan2(-VRd.x,-VRd.z);PL.pitch=clamp(Math.asin(clamp(VRd.y,-1,1)),-1.2,1.2);
  VR.on=false;VR.cur=null;VR.base=null;VR.ses=null;vrAttach();cam.rotation.order='YXZ';cam.aspect=innerWidth/innerHeight;cam.updateProjectionMatrix();
- if(sun.shadow.map){sun.shadow.map.dispose();sun.shadow.map=null}{const sm=window.matchMedia&&matchMedia('(pointer:coarse)').matches?1024:2048;sun.shadow.mapSize.set(sm,sm)}toast('VR выключен')}
+ gfxShadow();gfxRes();toast('VR выключен')}
 // кнопка «VR». Внутри страницы claude.ai браузер может запретить VR — тогда игра открывается в отдельной вкладке или скачивается файлом
 const bVR=$('bVR');
 if(!navigator.xr&&/Quest|Oculus|Pico/i.test(navigator.userAgent||'')){bVR.style.display='';bVR.classList.add('dim')}
@@ -3155,16 +3284,16 @@ function kReact(d,D,kind,stay){if(d.rag||!d.alive)return;const torso=kind==='ch'
  if((!stay&&Math.random()<(torso?.3:.12))||(!d.legs[0]&&!d.legs[1]))startFallStep(d,D.x,D.z,{imp:1.1});
  else if(!LOWST[d.st]){d.lookP=null;d.st='freeze';d.stateT=.8;d.path=null}}
 // укол: рана на коже, что дальше по пути клинка — по мере того, как он входит
-function kStab(d,k,E,D,spd,vr,bl){if(!d||!d.P[k])return null;const b=d.P[k].b,kind=k.slice(0,2),loose=d.P[k].loose;
+function kStab(d,k,E,D,spd,vr,bl,wn){if(!d||!d.P[k])return null;const b=d.P[k].b,kind=k.slice(0,2),loose=d.P[k].loose;
  const aware=!loose&&d.alive&&d.conc>35&&(d.seesPl||TNOW-d.lastPlT<1.2||(PANIC[d.st]&&d.fear>.5));
  sel=d;d.hits++;hmT=.14;sfxStab();
- const pl=kPlan(d,E,D,bl),rec={w:'Нож',part:RUS[k],org:[],out:'рана от ножа'};
+ const pl=kPlan(d,E,D,bl),rec={w:wn||'Нож',part:RUS[k],org:[],out:wn?'колотая рана':'рана от ножа'};
  KN.C.set(E.x,E.y,E.z);const lp=b.pointToLocalFrame(KN.C),cq=b.quaternion.conjugate();
  KN.C.set(-D.x,-D.y,-D.z);const ln=cq.vmult(KN.C);ln.normalize();KN.C.set(D.x,D.y,D.z);const ld=cq.vmult(KN.C);ld.normalize();
  // колешь в то же место — та же рана
  let w=null;for(const o of d.wounds)if(o.knife&&o.part===k&&Math.hypot(o.lp.x-lp.x,o.lp.y-lp.y,o.lp.z-lp.z)<.02){w=o;break}
- if(!w){w=addWound(d,k,new CV(lp.x,lp.y,lp.z),ln,(SOFTB[kind]||.0005)*1.2,false,[],false);w.knife=true;w.tau=360;if(loose)w.own=true;KN.C.set(KN.H.x,KN.H.y,KN.H.z);const hl=cq.vmult(KN.C);knifeMark(d,k,w,lp,hl,vr?.03:.028)}else w.rate+=(SOFTB[kind]||.0005)*.5;
- d.shots.unshift(rec);if(d.shots.length>3)d.shots.pop();
+ if(!w){w=addWound(d,k,new CV(lp.x,lp.y,lp.z),ln,(SOFTB[kind]||.0005)*1.2,false,[],false);w.knife=true;w.tau=360;if(loose)w.own=true;KN.C.set(KN.H.x,KN.H.y,KN.H.z);const hl=cq.vmult(KN.C);knifeMark(d,k,w,lp,hl,wn?.044:(vr?.03:.028))}else w.rate+=(SOFTB[kind]||.0005)*.5;
+ injAdd(d,rec,k);
  if(d.alive&&!loose){d.pain=Math.min(100,d.pain+26);d.conc-=5;if(kind==='ch'||kind==='be'||kind==='pe'){d.ktr=Math.min(95,(d.ktr||0)+8);d.internal=Math.min(.085,d.internal+.0018)}}d.blood-=.002;
  // знает, что ты опасен (но не то, что хлопок — выстрел); кто это видел — тоже
  d.knowsGun=true;d.fear=1;d.threatP.copy(cam.position);witness(d,true);faceStartle(d,1);wakeDoll(d);
@@ -3508,7 +3637,7 @@ function kCutPt(c,lp,dep,first){const q=kCutCo(c.k,lp);if(!q)return null;let h=c
 function kCutStart(d,k,b,lp,n,dep,vs){const kind=k.slice(0,2),loose=d.P[k].loose;
  const aware=!loose&&d.alive&&d.conc>35&&(d.seesPl||TNOW-d.lastPlT<1.2||(PANIC[d.st]&&d.fear>.5));
  sel=d;d.hits++;hmT=.1;sfxSlash(dep);
- const rec={w:'Нож',part:RUS[k],org:[],out:'резаная рана'};d.shots.unshift(rec);if(d.shots.length>3)d.shots.pop();
+ const rec={w:'Нож',part:RUS[k],org:[],out:'резаная рана'};injAdd(d,rec,k);
  const c={d,k,b,lp:new CV(lp.x,lp.y,lp.z),hole:null,len:0,since:0,dsum:0,dmax:dep,lastT:TNOW,rec,wn:0,loose,seg:0,ves:{}};kCutPt(c,lp,dep,true);kCutVes(c,c.lp,n,dep,kWorld(c));
  if(d.alive&&!loose){d.pain=Math.min(100,d.pain+6+dep*900);
   d.knowsGun=true;d.fear=1;d.threatP.copy(cam.position);witness(d,true);faceStartle(d,.8);wakeDoll(d);
@@ -3787,11 +3916,15 @@ function slLipOff(m,K,v){const s=m.KS[v];if(s===1||s===-1)return s*slGap(K,m.KA[
 // разрез закончен (или начат другой): щель «запекается» в сетку, стенки становятся обычными треугольниками
 function slBake(m,K,wfm,wfw){const nv=[0,0,0],P=m.P;
  if(wfm)for(let v=0;v<m.n;v++){const W=wfm(v);m.B0[v]=W[0];m.W0[v]=W[1];m.B1[v]=W[2];m.W1[v]=W[3]}
- if(K)for(let v=0;v<m.n;v++){const o=slLipOff(m,K,v);if(o){slNrm(m,K,v,nv);P[3*v]+=nv[0]*o;P[3*v+1]+=nv[1]*o;P[3*v+2]+=nv[2]*o}}
+ // v63: что запекли (сдвиг краёв щели и стенки) — зашитую рану мачете потом сводим обратно
+ const BK=K?((K.bk||(K.bk={}))[m.key]={v:[],o:[],t0:0,t1:0}):null;
+ if(K)for(let v=0;v<m.n;v++){const o=slLipOff(m,K,v);if(o){slNrm(m,K,v,nv);P[3*v]+=nv[0]*o;P[3*v+1]+=nv[1]*o;P[3*v+2]+=nv[2]*o;BK.v.push(v);BK.o.push(nv[0]*o,nv[1]*o,nv[2]*o)}}
+ if(BK)BK.t0=m.TM.length;
  const w=m.w;if(w&&w.n&&K){const base=m.n;for(let v=0;v<w.n;v++){const s=w.KS[v],g=slGap(K,w.KA[v],w.KB[v])/2;slNrm(m,K,v,nv,w);
    let b0=w.B0[v],w0=w.W0[v],b1=w.B1[v],w1=w.W1[v];if(wfw){const W=wfw(v);b0=W[0];w0=W[1];b1=W[2];w1=W[3]}
    slAddV(m,w.P[3*v]+s*nv[0]*g,w.P[3*v+1]+s*nv[1]*g,w.P[3*v+2]+s*nv[2]*g,w.N[3*v],w.N[3*v+1],w.N[3*v+2],w.U[2*v],w.U[2*v+1],b0,w0,b1,w1,w.L[v])}
   for(let i=0;i<w.I.length;i+=3){m.I.push(base+w.I[i],base+w.I[i+1],base+w.I[i+2]);m.TM.push(w.M[i/3]||1);m.TK.push(K.id);m.TS.push(w.KS[w.I[i]]);m.TP.push(0);m.TQ.push(0)}}
+ if(BK)BK.t1=m.TM.length;
  m.w=null;m.KS.fill(0);m.ED.length=0;m.TP.fill(0);m.TQ.fill(0);m.onT.length=0;m.loops.length=0;m.xc.clear();m.fc.clear();m.lc.clear();m.ver++}
 // связность: какие вершины соединены тканью (через треугольники и общие швы)
 function slFind(p,x){while(p[x]!==x){p[x]=p[p[x]];x=p[x]}return x}
@@ -3819,7 +3952,7 @@ function slToWorld(d,bi,p,o){const I=d.sl.bi[bi],b=I.b,c=PDM[I.org].c,q=b.quater
  return o.set(p.x-c[0]-I.off.x,p.y-c[1]-I.off.y,p.z-c[2]-I.off.z).applyQuaternion(SLQ0).add(SLV1.set(b.position.x,b.position.y,b.position.z))}
 function slLocal(d,bi,p){const I=d.sl.bi[bi],c=PDM[I.org].c;return new CV(p.x-c[0]-I.off.x,p.y-c[1]-I.off.y,p.z-c[2]-I.off.z)}
 // --- включение: кожа переходит на свою сетку ---
-function slInit(d){const _t=performance.now();try{return slInit_(d)}finally{slT('slInit',_t)}}
+function slInit(d){const _t=performance.now();try{const r=slInit_(d);try{slFlesh(d)}catch(e){bugLog('slFlesh',e)}return r}finally{slT('slInit',_t)}}
 function slInit_(d){if(d.sl)return d.sl;const s=d.skin,S={on:true,M:{},W:{wid:0,lx:new Map(),ll:new Map()},bi:[],used:PD.length,K:null,kid:0,pcs:[],cons:[],ign:new Set(),pages:[],caps:[],sh:{x:0,y:0,h:0,p:0},dirty:new Set(),tU:0};d.sl=S;
  PD.forEach((def,i)=>{S.bi[i]={b:d.P[def.n].b,off:new V3(),org:def.n,pc:null,hs:[]}});
  const hash=new Map(),HK=2e5;
@@ -4550,9 +4683,9 @@ function macBlade(d,pts,vel,D,En,Fn,dt,vr){if(!DOLLS.includes(d)||!d.skin)return
   if(!resume&&K&&TNOW-(K.tEng||-9)<.45&&ve<2.5){res.push=nS.multiplyScalar(best.dep+.001);return res}
   if(!resume&&S&&S.hist)for(const h of S.hist){const r=fit(slPlFrom(S,h.pl,C.bi));if(r){PS={pl:h.pl,flip:r.dir<0};break}}
   if(!resume&&macVerts(d)>46000){res.push=nS.multiplyScalar(best.dep+.001);return res}
-  if(!resume){K=slStart(d,p,D,En,C.bi,PS);if(!K&&PS)K=slStart(d,p,D,En,C.bi,null);S=d.sl;if(!K)return null;K.rec={w:'Мачете',part:RUS[C.k],org:[],out:'рубленая рана'};d.shots.unshift(K.rec);if(d.shots.length>3)d.shots.pop();
+  if(!resume){K=slStart(d,p,D,En,C.bi,PS);if(!K&&PS)K=slStart(d,p,D,En,C.bi,null);S=d.sl;if(!K)return null;K.rec={w:'Мачете',part:RUS[C.k],org:[],out:'рубленая рана'};injAdd(d,K.rec,C.k);
    const kb=K.ref,kB=S.bi[kb].b,lp=slLocal(d,kb,slToBind(d,kb,p,new V3())),ln=slDirBind(d,kb,En.clone().negate(),new V3());
-   const w=addWound(d,C.k,lp,new CV(ln.x,ln.y,ln.z),.0008,false,['рубленая рана'],false);w.b=kB;w.cut=true;w.tau=0;K.w=w}
+   const w=addWound(d,C.k,lp,new CV(ln.x,ln.y,ln.z),.0008,false,['рубленая рана'],false);w.b=kB;w.cut=true;w.tau=0;K.w=w;w.K=K}
   K.eng=true;K.pa=null;K.cut0=K.area;sel=d;d.hits++;hmT=.2;
   // пилишь: клинок на миг вышел из щели и вернулся (медленно) — это не новый удар: без звука рубки, рывка в руку и брызг каждый раз
   const saw=ve<2.5&&TNOW-(d.macT||-9)<.6;
@@ -4603,8 +4736,8 @@ function macBlock(c,B,V,Rp){const par=c.grip.parent;if(!par)return;par.updateMat
  const tipV=VV[N-1].length();if(tipV>5.5&&TNOW-MCB.wh>.38){MCB.wh=TNOW;sfxWhoosh(tipV*.8)}
  if(MCB.liq>.01&&tipV>3.2){MCB.ca=(MCB.ca||0)+(tipV-3.2)*dt*10*Math.min(1,MCB.liq);let n=0;while(MCB.ca>=1&&n<5){MCB.ca-=1;n++;const i=2+ri(N-2),v=VV[i].clone().multiplyScalar(rnd(.35,.7));runit();v.addScaledVector(RU,.12);const vol=rnd(8e-9,3e-8);emit(P[i].clone(),v,Math.cbrt(vol*.2387),vol,Math.random()<.5?5:0);MCB.liq=Math.max(0,MCB.liq-vol*6e5)}}
  MCB.liq=Math.max(0,MCB.liq-dt*.004);
- const off=new V3();let eng=false;
- for(const d of DOLLS){const pe=d.P.pelvis.b.position;if((pe.x-P[mid5()].x)**2+(pe.z-P[mid5()].z)**2>5)continue;const r=macBlade(d,P,VV,D,En,Fn,dt,true);if(!r)continue;
+ const off=new V3();let eng=false;let mst=null;try{mst=macStabVR(P,VV,D,En,Fn,dt)}catch(e){bugLog('macStabVR',e)}if(mst){off.add(mst);eng=true}
+ for(const d of (mst?[]:DOLLS)){const pe=d.P.pelvis.b.position;if((pe.x-P[mid5()].x)**2+(pe.z-P[mid5()].z)**2>5)continue;const r=macBlade(d,P,VV,D,En,Fn,dt,true);if(!r)continue;
   if(r.push)off.add(r.push);if(r.K&&r.K.eng){eng=true;if(r.ex>0)off.addScaledVector(macEw(d,r.K,new V3()),-r.ex);if(r.dn)off.addScaledVector(macNw(d,r.K,new V3()),-r.dn)}
   if(r.K&&r.K.ch&&MGRP.visible)try{MGRP.updateMatrixWorld(true);if(Math.random()<.25)wBloodAt(MGRP,P[3+ri(5)],Fn,.7)}catch(e){}}
  MCB.eng=eng;if(off.lengthSq()<1e-12)return;
@@ -4615,16 +4748,14 @@ function mid5(){return 5}
 /* ---------- без шлема: взмах на экране ---------- */
 const MCS={t:-1,dir:0,sw:null};
 function macRay(o,dir,far){let best=null;for(const d of DOLLS){const caps=macCaps(d),P=new V3();for(let s=.05;s<far;s+=.01){P.copy(o).addScaledVector(dir,s);for(const C of caps)if(macIn(C,P))return{d,C,p:P.clone(),s}}}return best}
-function macShoot(W){cool=W.cd;if(VR.on)return;MCS.t=0;MCS.dir=(MCS.dir+1)%4;sfxWhoosh(7.5);cam.updateMatrixWorld();
- const o=new V3().setFromMatrixPosition(cam.matrixWorld),F=new V3();cam.getWorldDirection(F);const h=macRay(o,F,2.4),e=(RC.setFromCamera(CEN,cam),RC.far=2.6,RC.intersectObjects(ENV,false)[0]);MCS.sw=null;
+function macShoot(W){cool=W.cd;if(VR.on)return;if(MCS.mode==='stab'){macStab2D(W);return}MCS.t=0;MCS.anim='chop';MCS.dir=1;MCS.st=null;sfxWhoosh(7.5);cam.updateMatrixWorld();
+ const o=new V3().setFromMatrixPosition(cam.matrixWorld),F=new V3();cam.getWorldDirection(F);const h=skinRay(o,F,2.4),e=(RC.setFromCamera(CEN,cam),RC.far=2.6,RC.intersectObjects(ENV,false)[0]);MCS.sw=null;
  if(!h||(e&&e.distance<h.s))return;const Rt=new V3().crossVectors(F,cam.up).normalize(),Up=new V3().crossVectors(Rt,F).normalize();
  // направление удара: сверху вниз, справа налево, наискось, слева направо
  const En=MCS.dir===0?Up.clone().negate():MCS.dir===1?Rt.clone().negate():MCS.dir===2?Rt.clone().multiplyScalar(-.7).addScaledVector(Up,-.7):Rt.clone().multiplyScalar(.6).addScaledVector(Up,-.8);En.normalize();
  MCS.sw={d:h.d,X:h.p.clone(),D:F.clone(),En,Fn:new V3().crossVectors(F,En).normalize(),s:-.26,v:rnd(8.5,10.5),t0:.08}}
-function mac2D(rdt){if(VR.on){MCS.t=-1;MCS.sw=null;return}
- if(wi===WI_MAC&&MGRP.parent===cam){if(MCS.t>=0){MCS.t+=rdt;const t=MCS.t,k=t<.1?smt(t/.1):t<.48?1-smt((t-.1)/.38):0,s=MCS.dir===3?-1:1;
-   MGRP.rotation.set(.8-1.7*k,.38-(MCS.dir===1?1.15:.55)*k*s,1.4-.55*k*s);MGRP.position.set(.24-.2*k*s,-.27+.05*k,-.4-.12*k);if(t>.48)MCS.t=-1}
-  else{MGRP.rotation.set(.8,.38,1.4);MGRP.position.set(.24,-.27,-.4)}}
+function mac2D(rdt){try{macStabChk(rdt)}catch(e){bugLog('macStab',e)}if(VR.on){MCS.t=-1;MCS.sw=null;return}
+ if(wi===WI_MAC&&MGRP.parent===cam){if(MCS.t>=0){MCS.t+=rdt;if(!macAnim2D(MCS.t))MCS.t=-1}else macAnim2D(-1)}
  const W=MCS.sw;if(!W||!(rdt>0))return;if(MCS.t>=0&&MCS.t<W.t0)return;
  // лезвие (на экране не видно, где оно в теле) проходит через точку прицела по плоскости удара
  const steps=Math.max(1,Math.ceil(W.v*rdt/.012)),h=rdt/steps;
@@ -4966,9 +5097,8 @@ function medReset(){if(MED.wrap)wrapEnd(MED.wrap);MED.wrap=null;WTL.visible=fals
  try{if(MED.sew2&&MED.sew2.TH)thCut(MED.sew2.TH,'auto');if(MED.su){if(MED.su.pin&&VR.R)suUnpin(MED.su,VR.R);if(MED.su.th)thCut(MED.su.th,'auto')}}catch(e){bugLog('thCut',e)}MED.sew2=null;MED.su=null;SUFREE.visible=false;MEDL.visible=false;
  if(MED.tw){const T=MED.tw,H=T.hold;if(H){if(H.L.out)bulletDrop(H.m,null);else{if(H.m.parent)H.m.parent.remove(H.m);H.L.m.visible=XR.on}}T.hold=null;T.in=null;T.wasIn=false;T.pT=null}try{twClose();probeSnd(0);medPal(false)}catch(e){}const I=MED.inj;if(I.d&&VR.R)injOut(VR.R);I.d=null;I.press=0;I.done=false;I.outT=0;syrShow(0)}
 function medBtn(){const b=$('medt');if(!b)return;const on=wi===WI_MED&&!VR.on&&!editing;b.style.display=on?'block':'none';if(!on)try{medPal(false)}catch(e){}if(on){b.textContent=tr(MEDT[MED.t].n);medPos()}}
-function medPos(){const b=$('medt'),w=$('wpn');if(!b||!w||b.style.display==='none')return;const r=w.getBoundingClientRect(),h=b.offsetHeight||36;
- b.style.left=Math.max(6,r.right-Math.max(b.offsetWidth,r.width))+'px';b.style.top=Math.max(6,r.top-h-8)+'px'}
-function setW (i){setW0(i);if(!MEDR)return;if(VR.on&&MEDT[MED.t].flat)MED.t=0;medReset();medAttach();medModel();medBtn();if(WPN[wi].med){try{$('fire').textContent=tr('Применить')}catch(e){}if(!MED.hint&&!VR.on){MED.hint=true;setTimeout(()=>toast('Аптечка: средство меняется кнопкой над оружием'),900)}}}
+function medPos(){const b=$('medt');if(!b||b.style.display==='none')return;try{hudAbove(b)}catch(e){}}
+function setW (i){setW0(i);try{macBtn()}catch(e){}if(!MEDR)return;if(VR.on&&MEDT[MED.t].flat)MED.t=0;medReset();medAttach();medModel();medBtn();if(WPN[wi].med){try{$('fire').textContent=tr('Применить')}catch(e){}if(!MED.hint&&!VR.on){MED.hint=true;setTimeout(()=>toast('Аптечка: средство меняется кнопкой над оружием'),900)}}}
 $('medt').addEventListener('pointerdown',e=>{if(editing)return;ac();e.preventDefault();e.stopPropagation();medPal()});
 
 /* ---- сечение тела: по каждой части снято с модели — центр и полуоси в 24 слоях по длине ---- */
@@ -5017,6 +5147,21 @@ const MTP=new V3(),MTN=new V3(),MLP=new V3();
 function medNear(p,maxD){profInit();let best=null;for(const d of DOLLS){const c=d.P.chest.b.position;if((c.x-p.x)**2+(c.z-p.z)**2>2.2)continue;
   for(const t of medBodies(d)){if(!PROF[t.k])continue;toProf(t,p,MLP);const cap=partCap(d,t.b,t.k,t.I);wrapProj(t.k,cap,MLP,MTP,MTN);let dist=MLP.distanceTo(MTP);
    const dep=profDepth(t.k,cap,MLP);if(dep>0)dist=-dep;if(dist<maxD&&(!best||dist<best.dist))best={d,b:t.b,k:t.k,off:t.off,I:t.I,cap,dist,lp:MLP.clone()}}}return best}
+
+// v63: глубина под НАСТОЯЩЕЙ кожей (луч по нормали сечения в сетку манекена в позе привязки). Сечение — эллипс: на груди, у лопаток и шеи
+// он то внутри кожи, то снаружи на 5–8 мм — инструменты «входили» раньше или позже, чем видно. У культи и где луч не попал — по эллипсу.
+const RDP=new V3(),RDN=new V3(),RDQ=new V3();
+function skinDepth(k,cap,lp){const pd=profDepth(k,cap,lp);if(cap)return pd;const P=PROF[k];if(!P||lp.y<P.y0-.012||lp.y>P.y1+.012)return pd;
+ wrapProjX(k,null,lp,RDP,RDN);const q=skinHitP(k,RDP,RDN,RDQ);if(!q||q.distanceTo(RDP)>.03)return pd;return RDQ.sub(lp).dot(RDN)}
+// точка на настоящей коже над lp (в координатах сечения) и нормаль
+function skinAt(t,lp,out,n){wrapProjX(t.k,t.cap,lp,out,n);if(!t.cap){const q=skinHitP(t.k,out,n,RDQ);if(q&&q.distanceTo(out)<.03)out.copy(q)}return out}
+// грудь и живот «дышат» (масштаб кости): кожа на экране — дальше, чем в позе привязки (у груди спереди — до 9 мм)
+const RDS=new V3();
+function partScale(t){const d=t.d;if(!d||!d.skin||!d.P[t.k]||d.P[t.k].b!==t.b)return null;const bn=d.skin.bones[BI[t.k]];if(!bn)return null;const s=bn.scale;return Math.abs(s.x-1)+Math.abs(s.y-1)+Math.abs(s.z-1)>1e-4?s:null}
+function skinDepthT(t,lp){const s=partScale(t);if(!s)return skinDepth(t.k,t.cap,lp);RDS.set(lp.x/s.x,lp.y/s.y,lp.z/s.z);return skinDepth(t.k,t.cap,RDS)*Math.min(s.x,s.z)}
+function skinAtT(t,lp,out,n){const s=partScale(t);if(!s)return skinAt(t,lp,out,n);RDS.set(lp.x/s.x,lp.y/s.y,lp.z/s.z);skinAt(t,RDS,out,n);return out.set(out.x*s.x,out.y*s.y,out.z*s.z)}
+// ближайшая часть у точки: dist<0 — под настоящей кожей на |dist|
+function medNearSkin(p,maxD){const t=medNear(p,.03);if(!t)return null;if(!t.cap)t.dist=-skinDepthT(t,t.lp);return t.dist<maxD?t:null}
 
 /* ---- бинт: лента по поверхности ---- */
 const WRAPS=[],BMAX=420,BAND_TEX=(()=>{const c=mkCanvas(64,64),g=c.getContext('2d');g.fillStyle='#f0e4cf';g.fillRect(0,0,64,64);g.globalAlpha=.22;g.fillStyle='#a8916f';
@@ -5109,7 +5254,7 @@ function injOut(R){const I=MED.inj;I.d=null;I.b=null;if(R&&R.model)hNomApply(R);
 function vrInject(dt){const I=MED.inj,T=MEDT[MED.t],R=VR.R;if(MDUR[T.id]===undefined||!R||!R.src)return;const o=MEDK.syr;
  medGrip();o.updateMatrixWorld(true);SYT.copy(NTIP);o.localToWorld(SYT);SYH.copy(NHUB);o.localToWorld(SYH);SYD.subVectors(SYT,SYH).normalize();
  if(!I.d){if(I.done){I.outT+=dt;if(I.outT>1.1){I.done=false;I.press=0;I.outT=0;syrShow(0)}return}
-  const t=medNear(SYT,.004);if(!t||t.dist>-.004)return;wrapProj(t.k,t.cap,t.lp,MTP,MTN);const nW=new V3();fromProf(t,MTP,SYE);fromProf(t,MTP.clone().add(MTN),nW);nW.sub(SYE).normalize();
+  const t=medNearSkin(SYT,.004);if(!t||t.dist>-.004)return;wrapProj(t.k,t.cap,t.lp,MTP,MTN);const nW=new V3();fromProf(t,MTP,SYE);fromProf(t,MTP.clone().add(MTN),nW);nW.sub(SYE).normalize();
   if(SYD.dot(nW)>-.25)return;I.d=t.d;I.b=t.b;I.off=t.off;I.k=t.k;toProf(t,SYE,I.lp);I.n.copy(MTN);
   // поза шприца в системе тела — дальше он стоит так
   I.Ml=(I.Ml||new THREE.Matrix4()).copy(bodyM(t.b,SYB).invert()).multiply(o.matrixWorld);
@@ -5128,14 +5273,14 @@ function inj2Step(rdt){const A=MED.inj2;if(!A)return;A.t+=rdt;const k=A.t<.18?sm
  if(p>=1&&DOLLS.indexOf(A.d)>=0){A.done=true;A.end=A.t;medInject(A.d,A.T)}}
 
 /* ---- куда применяем без шлема: по прицелу вблизи ---- */
-function medPick(){aimRay(MED.o,MED.dir);let far=2.6;if(VR.on){MED.o.addScaledVector(MED.dir,-.06);far=.42}RC.set(MED.o,MED.dir);RC.far=far;let h=null;
+function medPick0(){aimRay(MED.o,MED.dir);let far=2.6;if(VR.on){MED.o.addScaledVector(MED.dir,-.06);far=.42}RC.set(MED.o,MED.dir);RC.far=far;let h=null;
  for(const h0 of RC.intersectObjects(DMESH,false)){const x=slRayFix(h0.object.userData.d,h0,RC.ray);if(x){h=x;break}}
  const e=RC.intersectObjects(ENV,false)[0];if(!h||(e&&e.distance<h.distance))return null;const d=h.object.userData.d;let k=h.object.userData.k;
  if(!k||!d.P[k]){let bd=1e9;for(const n in d.P){const b=d.P[n].b,q=(b.position.x-h.point.x)**2+(b.position.y-h.point.y)**2+(b.position.z-h.point.z)**2;if(q<bd){bd=q;k=n}}}
  return{d,k,p:h.point.clone()}}
 function medShoot(W){cool=W.cd;const T=MEDT[MED.t];
  if(VR.on){if(T.id==='bag'){const h=medPick();if(!h){toast('Поднеси к манекену');return}sel=h.d;medBag(h.d)}return}
- MED.an=0;const h=medPick();if(!h){toast('Подойди ближе к манекену');return}const d=h.d;sel=d;
+ MED.an=0;const h=medPick(T.id);if(!h){toast('Подойди ближе к манекену');return}const d=h.d;sel=d;
  if(T.id==='band'){if(MED.auto)return;const A=autoStart(d,h.p);if(!A){toast('Здесь нет раны');return}MED.auto=A;MED.an=-1}
  else if(T.id==='bag')medBag(d);else if(T.id==='cpr')medCPR(d,h.k);
  else if(T.id==='tw'){const L=twPick(d,h.p);if(!L){toast(d.lodge&&d.lodge.some(q=>!q.out)?'Наведи на рану, где застряла пуля':'Здесь нет застрявшей пули');return}twOpen(d,L)}
@@ -5261,13 +5406,16 @@ function twSquelch(){try{noise(.14,900,.18,2,'bandpass');setTimeout(()=>noise(.0
 // извлекли
 function lodgeOut(d,L){L.out=true;if(L.rec)L.rec.out='пуля извлечена';if(L.w){L.w.lodge=(d.lodge||[]).some(q=>q!==L&&!q.out&&q.w===L.w);L.w.rate+=.0007;L.w.tau=Math.max(L.w.tau||0,60)}
  if(L.m){if(L.m.parent)L.m.parent.remove(L.m);const i=d.xr.indexOf(L.m);if(i>=0)d.xr.splice(i,1)}if(d.alive)d.pain=Math.min(100,d.pain+12);
- try{statAdd('bx')}catch(e){}twSquelch();metalTick(null,true);toast('Пуля извлечена');sel=d}
+ try{statAdd('bx')}catch(e){}twSquelch();metalTick(null,true);toast('Пуля извлечена');sel=d;
+ // v63: в миг, когда пуля вышла, — один сильный выброс крови из раны
+ try{const W=woundW(d,L.w,new V3()),b=L.w&&woundBody(d,L.w);if(W&&b&&L.w.ln){b.vectorToWorldFrame(L.w.ln,C1);const n=new V3(C1.x,C1.y,C1.z);if(n.lengthSq()>1e-8){n.normalize();W.addScaledVector(n,.003);
+   const es=EMIT_SRC;EMIT_SRC=d;try{gush(W,n,22,1.5,3.2,.3,1e-7,3.6e-7,0);gush(W,n,10,.5,1.2,.75,4e-8,1.6e-7,0)}finally{EMIT_SRC=es}MED.gushN=(MED.gushN||0)+1}}}catch(e){bugLog('lodgeGush',e)}}
 // шлем (v62): кончик вошёл под кожу у раны, где застряла пуля (до 2,5 см от неё) — пинцет в ране, канал — куда ведёшь сам.
 // Пуля — на глубине 1,4–3 см (где бы она ни была по рентгену): дошёл — металлический щелчок и дрожь; сжал курок — схватил;
 // тянешь — рука дрожит, из раны брызжет кровь; кончик вышел из кожи — пуля извлечена. Отпустил курок в ране — пуля осталась,
 // дёрнул слишком резко — выскользнула. Бранши в крови на ту глубину, на которую входил.
 const TWO={},TWN=new V3(),TWF=new V3();
-function lodgeDv(d,L){if(L.dv)return L.dv;let r=.03;if(woundW(d,L.w,TWE)&&lodgeB(d,L,TWB))r=TWE.distanceTo(TWB);return L.dv=clamp(r*.55,.014,.03)}
+function lodgeDv(d,L){if(L.dv)return L.dv;let r=.03;if(woundW(d,L.w,TWE)&&lodgeB(d,L,TWB))r=TWE.distanceTo(TWB);return L.dv=clamp(r*.45,.01,.022)}
 function twCoat(T,dep){T.coat=Math.max(T.coat||0,Math.min(.06,dep+.003));T.wet=1}
 function twCoatUpd(T,dt,sc){const u=MEDK.tw.userData,L=(T.coat||0)/(sc||1);T.wet=Math.max(0,(T.wet||0)-dt/45);for(const c of u.C){c.visible=L>.002;c.scale.z=Math.max(.001,L)}
  TWCM.color.setRGB(.6-.32*(1-T.wet),.04,.06);TWCM.roughness=.3+.4*(1-T.wet)}
@@ -5281,9 +5429,11 @@ function vrTweezers(dt){const R=VR.R;if(!R||!R.src)return;const T=MED.tw||(MED.t
  // пуля уже вынута, в губках: отпустил — падает
  if(T.hold&&T.hold.L.out){if(tv<.3){bulletDrop(T.hold.m,null);T.hold=null}T.tv=tv;T.wasIn=false;return}
  if(T.in){const I=T.in,d=I.d,L=I.L;if(DOLLS.indexOf(d)<0||!I.t.b.world||L.out){twLeave(T);T.tv=tv;return}
-  fromProf(I.t,I.E,TWE);const lp=toProf(I.t,TWT,TWP),pd=profDepth(I.t.k,I.t.cap,lp),dep=TWT.distanceTo(TWE);
+  fromProf(I.t,I.E,TWE);const lp=toProf(I.t,TWT,TWP),pd=skinDepthT(I.t,lp),dep=TWT.distanceTo(TWE);
   // кончик вышел из кожи (или ушёл далеко вбок под кожей)
-  if(pd<=0||dep>.07){if(T.hold){lodgeOut(d,L);vrPulse(R,.9,50);twSquirt(I,1.6);T.in=null;probeSnd(0)}else twLeave(T);T.tv=tv;T.wasIn=pd>0;return}
+  if(pd<=0||dep>.07){// рванул наружу одним махом (быстрее 1,6 м/с) — пуля выскользнула и осталась в ране
+   if(T.hold&&sp>1.6){const H=T.hold;if(H.m.parent)H.m.parent.remove(H.m);T.hold=null;L.m.visible=XR.on;L.dv=clamp(I.pd||.012,.008,.022);toast('Пуля выскользнула — тяни медленнее');vrPulse(R,.4,20);twLeave(T)}
+   else if(T.hold){lodgeOut(d,L);vrPulse(R,1,140);twSquirt(I,1.6);T.in=null;probeSnd(0)}else twLeave(T);T.tv=tv;T.wasIn=pd>0;return}
   twCoat(T,dep);probeSnd(clamp(sp*4,0,1));if(d.alive)d.pain=Math.min(100,d.pain+dt*(5+sp*25));sel=d;
   if(T.hold){const H=T.hold,pull=Math.max(0,(I.pd-dep)/Math.max(dt,1e-3));I.pd=dep;H.m.position.copy(u.tip);H.m.position.z+=.004;
    if(pull>1.6){// рванул — выскользнула (осталась там, где была)
@@ -5297,13 +5447,15 @@ function vrTweezers(dt){const R=VR.R;if(!R||!R.src)return;const T=MED.tw||(MED.t
   I.touch=touch;if(touch){T.vibT-=dt;if(T.vibT<=0){T.vibT=.12;vrPulse(R,.2,22)}}
   if(touch&&tv>.62&&T.tv<=.62){const m=bulletMesh(L.kind);g.add(m);m.position.copy(u.tip);m.position.z+=.004;T.hold={d,L,m};L.m.visible=false;metalTick(TWT,true);twSquelch();vrPulse(R,.9,45);I.pd=dep;T.vibT=.06;T.sqT=.04}
   T.tv=tv;T.wasIn=true;return}
- // снаружи: кончик только что вошёл под кожу? У раны с пулей — в ране
- const t=medNear(TWT,.004),inn=!!(t&&t.dist<-.0012);
- if(inn&&!T.wasIn){t.cap=t.cap||partCap(t.d,t.b,t.k,t.I);wrapProj(t.k,t.cap,t.lp,MTP,MTN);fromProf(t,MTP,TWE);
-  let best=null,bd=.025;for(const L of t.d.lodge||[]){if(L.out||!woundW(t.d,L.w,TWB))continue;const q=TWB.distanceTo(TWE);if(q<bd){bd=q;best=L}}
-  if(best){T.in={d:t.d,t:{b:t.b,k:t.k,off:t.off,cap:t.cap,I:t.I,d:t.d},L:best,E:MTP.clone(),n:MTN.clone(),touch:false,pd:0};vrPulse(R,.3,16);twSquelch();sel=t.d;
+ // снаружи (v63): кончик под настоящей кожей у раны с пулей (до 2,5 см) — в ране; вошёл рядом и подвёл под кожей к ране (до 1,6 см) — тоже
+ const t=medNearSkin(TWT,.004),inn=!!(t&&t.dist<-.001);
+ if(inn&&(!T.wasIn||(TNOW-(T.slT||-9)>.08&&-t.dist<.022))){T.slT=TNOW;t.cap=t.cap||partCap(t.d,t.b,t.k,t.I);skinAtT(t,t.lp,MTP,MTN);fromProf(t,MTP,TWE);
+  let best=null,bd=T.wasIn?.016:.025;for(const L of t.d.lodge||[]){if(L.out||!woundW(t.d,L.w,TWB))continue;const q=TWB.distanceTo(TWE);if(q<bd){bd=q;best=L}}
+  if(best){// вход — на коже у самой раны: глубина до пули считается от неё
+   woundW(t.d,best.w,TWB);toProf(t,TWB,TWP);skinAtT(t,TWP,MTP,MTN);
+   T.in={d:t.d,t:{b:t.b,k:t.k,off:t.off,cap:t.cap,I:t.I,d:t.d},L:best,E:MTP.clone(),n:MTN.clone(),touch:false,pd:0};vrPulse(R,.3,16);twSquelch();sel=t.d;
    if(t.d.alive)t.d.pain=Math.min(100,t.d.pain+4);if(!MED.twTip){MED.twTip=true;toast('Пинцет в ране — веди глубже, к пуле')}}
-  else if(TNOW-(MED.twNo||-9)>3&&t.d.wounds.some(w=>!w.own&&woundW(t.d,w,TWB)&&TWB.distanceTo(TWE)<.025)){MED.twNo=TNOW;toast('В этой ране пули нет')}}
+  else if(!T.wasIn&&TNOW-(MED.twNo||-9)>3&&t.d.wounds.some(w=>!w.own&&woundW(t.d,w,TWB)&&TWB.distanceTo(TWE)<.025)){MED.twNo=TNOW;toast('В этой ране пули нет')}}
  T.wasIn=inn;probeSnd(0);T.tv=tv}
 // без шлема: окно с мини-игрой
 const TWG={on:false};
@@ -5334,7 +5486,7 @@ function twDraw(){const c=$('twc');if(!c)return;const W=c.width,H=c.height,g=c.g
 function twMove(e,down){if(!TWG.on||TWG.done)return;e.preventDefault();const [x,y]=twXY(e),now=performance.now()/1000,dt=Math.max(.008,now-(TWG.lt||now-.016));TWG.lt=now;
  const sp=TWG.tx>-9?Math.hypot(x-TWG.tx,y-TWG.ty)/dt:0;TWG.tx=x;TWG.ty=y;TWG.sp=TWG.sp*.6+sp*.4;if(down!==undefined)TWG.down=down;
  const inW=Math.hypot(x,y)<1.02,L=TWG.L,d=TWG.d;
- if(TWG.hold){if(!inW){TWG.done=1;lodgeOut(d,L);TWG.hold=false;$('twh').textContent='';probeSnd(0);try{navigator.vibrate&&navigator.vibrate([40,40,60])}catch(er){}setTimeout(twClose,900);twDraw();return}
+ if(TWG.hold){if(!inW){TWG.done=1;lodgeOut(d,L);TWG.hold=false;$('twh').textContent='';probeSnd(0);try{navigator.vibrate&&navigator.vibrate([90,30,160])}catch(er){}{const a0=Math.atan2(y,x);for(let i=0;i<34;i++){const a=a0+rnd(-1.1,1.1),v=rnd(.6,2.3);TWG.bl.push({x:Math.cos(a0)*TWG.r0,y:Math.sin(a0)*TWG.r0,vx:Math.cos(a)*v,vy:Math.sin(a)*v,r:rnd(.012,.036),t:0,T:rnd(.5,.95),c:ri(60)})}if(TWG.bl.length>90)TWG.bl.splice(0,TWG.bl.length-90)}setTimeout(twClose,900);twDraw();return}
   {const r=Math.hypot(x,y);if(r>TWG.r0+.004){TWG.vT-=dt;if(TWG.vT<=0){TWG.vT=.1;try{navigator.vibrate&&navigator.vibrate(18)}catch(er){}
     for(let i=0;i<3;i++){const a=Math.atan2(y,x)+rnd(-.9,.9),v=rnd(.3,1.1);TWG.bl.push({x:x*.85,y:y*.85,vx:Math.cos(a)*v,vy:Math.sin(a)*v,r:rnd(.008,.022),t:0,T:rnd(.35,.7),c:ri(60)})}
     if(TWG.bl.length>60)TWG.bl.splice(0,TWG.bl.length-60);try{const W=woundW(d,L.w,new V3());if(W){const n=new V3(),b=d.P[L.w.part]&&d.P[L.w.part].b;if(b&&L.w.ln){b.vectorToWorldFrame(L.w.ln,C1);n.set(C1.x,C1.y,C1.z).normalize()}else n.set(0,1,0);const es=EMIT_SRC;EMIT_SRC=d;gush(W.addScaledVector(n,.003),n,2,.4,1.1,.6,2e-8,1e-7,0);EMIT_SRC=es}}catch(er){}}}TWG.r0=r}
@@ -5387,7 +5539,7 @@ function stitchMesh(D,A,nA,B,nB){SUA.copy(A).addScaledVector(nA,.0011);SUB.copy(
 const SWA=new V3(),SWB=new V3(),SWP=new V3(),SWN=new V3(),SWN2=new V3();
 function stitchW(t,A,B){const D=decoFor(t.d,t.b,t.k,t.off);toProf(t,A,SWA);toProf(t,B,SWB);wrapProj(t.k,t.cap,SWA,SWP,SWN);const a=SWP.clone();wrapProj(t.k,t.cap,SWB,SWP,SWN2);stitchMesh(D,a,SWN.clone(),SWP.clone(),SWN2.clone())}
 // сколько стежков нужно ране
-function sewNeed(w){const tg=(w.tags||[]).map(String);if(tg.some(t=>/^(оторвано|пришито)/.test(t)))return 6;if(tg.some(t=>/рублен/.test(t)))return 5;if(w.cut)return w.blunt?2:3;if(tg.some(t=>/резан/.test(t)))return 3;return w.exit?3:2}
+function sewNeed(w){if(isGash(w))return w.macN||gashNeed(w);const tg=(w.tags||[]).map(String);if(tg.some(t=>/^(оторвано|пришито)/.test(t)))return 6;if(tg.some(t=>/рублен/.test(t)))return 5;if(w.cut)return w.blunt?2:3;if(tg.some(t=>/резан/.test(t)))return 3;return w.exit?3:2}
 function isStumpW(w){return(w.tags||[]).some(t=>String(t).indexOf('оторвано')===0)}
 // шов на коже (текстура): отверстие закрыто, линия со стежками; зажило — бледный рубец
 function sewMark(d,w,th){if(!w.R||!REG[w.R])return;if(th)w.thr=true;const H=d.holes||(d.holes=[]);
@@ -5533,16 +5685,66 @@ function woundLine(TH,w,C,n,u){const t=TH.t;if(!woundS(t,w,C))return false;wrapP
  if(w.cut&&w.knife){let best=null,bd=.075;for(const w2 of TH.d.wounds){if(w2===w||!w2.cut||!w2.knife||woundBody(TH.d,w2)!==t.b)continue;if(!woundS(t,w2,THW))continue;const q=THW.distanceTo(C);if(q>.004&&q<bd){bd=q;best=THW.clone()}}
   if(best){u.subVectors(best,C);u.addScaledVector(n,-u.dot(n));if(u.lengthSq()>1e-10){u.normalize();w.sdir=u.clone();return true}}}
  return 'free'}
-function woundCross(TH,A,B){const d=TH.d,t=TH.t,C=new V3(),n=new V3(),u=new V3(),v=new V3(),M=A.p.clone().add(B.p).multiplyScalar(.5),ab=A.p.distanceTo(B.p);if(ab>.036||ab<.003)return null;let best=null,bs=1e9;
- for(const w of d.wounds){if(w.own||w.sewn||w.healed||w.seam||w.lodge)continue;if(woundBody(d,w)!==t.b)continue;const lr=woundLine(TH,w,C,n,u);if(!lr||C.distanceTo(M)>.045)continue;
+function woundCrossFind(TH,A,B){const d=TH.d,t=TH.t,C=new V3(),n=new V3(),u=new V3(),v=new V3(),M=A.p.clone().add(B.p).multiplyScalar(.5),ab=A.p.distanceTo(B.p);if(ab>.036||ab<.003)return null;let best=null,bs=1e9;
+ for(const w of d.wounds){if(w.own||w.sewn||w.healed||w.seam||w.lodge)continue;if(woundBody(d,w)!==t.b)continue;
+  if(isGash(w)){const r=gashCross(TH,w,A,B);if(r&&r.sc<bs){bs=r.sc;best={w,X:r.X,u:null}}continue}
+  const lr=woundLine(TH,w,C,n,u);if(!lr||C.distanceTo(M)>.045)continue;
   if(lr==='free'){u.crossVectors(n,THU.subVectors(B.p,A.p));if(u.lengthSq()<1e-12)continue;u.normalize()}
   v.crossVectors(n,u).normalize();const sA=THA.subVectors(A.p,C).dot(v),sB=THB.subVectors(B.p,C).dot(v);if(sA*sB>0||Math.abs(sA-sB)<.004)continue;
   THX.copy(A.p).lerp(B.p,sA/(sA-sB));const al=Math.abs(THU.subVectors(THX,C).dot(u)),hl=w.cut&&!w.blunt?(w.knife?.024:.03):.0075;if(al>hl)continue;
   if(w.sew&&w.sew.xs&&w.sew.xs.some(x=>x.distanceTo(THX)<.0025))continue;const sc=al+C.distanceTo(M)*.3;if(sc<bs){bs=sc;best={w,X:THX.clone(),u:lr==='free'?u.clone():null}}}
- if(!best)return null;const w=best.w;if(best.u&&!w.sdir)w.sdir=best.u;if(!w.sew)w.sew={n:0,N:sewNeed(w)};if(!w.sew.xs)w.sew.xs=[];
+ return best}
+function woundCross(TH,A,B){const best=woundCrossFind(TH,A,B);if(!best)return null;const d=TH.d,w=best.w;if(best.u&&!w.sdir)w.sdir=best.u;if(!w.sew)w.sew={n:0,N:sewNeed(w)};if(!w.sew.xs)w.sew.xs=[];
  w.sew.n++;w.sew.xs.push(best.X);TH.ws.add(w);w.rate*=1-.5/w.sew.N;if(w.art&&w.sew.n>=2){w.art=false;w.vj=0}if(d.alive)d.pain=Math.min(100,d.pain+3);sel=d;
  if(w.sew.n>=w.sew.N){if(!w.sewR){w.sewR=true;toast(VR.on?'Рана зашита — обрежь нить ножницами (левый курок)':'Рана зашита')}}else toast(tr('Стежок ')+w.sew.n+'/'+w.sew.N);
  return w}
+/* ---- v63: рана мачете — щель по плоскости разреза. Стежок засчитан, если вход и выход по разные стороны плоскости (1,2–25 мм),
+   а переход — там, где клинок прошёл (фронт разреза). Нужно стежков — по длине щели на коже (≈ 1 на 1,1 см, 2–7). Зашита — щель сходится ---- */
+function gashPl(w){const K=w.K;return K&&K.pl?K.pl[K.ref]:null}
+// щель (недорубленная часть), а не культя: разрез ничего не отделил, рана не шов пришитого
+function isGash(w){return!!(w.K&&gashPl(w)&&!(w.K.full&&w.K.full.size)&&!w.seam&&!isStumpW(w))}
+// точка в координатах сечения части k: расстояние до плоскости s и где она на плоскости (a, b)
+function gashSide(w,k,p){const pl=gashPl(w),c=PDM[k].c,x=p.x+c[0]-pl.ox,y=p.y+c[1]-pl.oy,z=p.z+c[2]-pl.oz;return{s:x*pl.nx+y*pl.ny+z*pl.nz,a:x*pl.ax+y*pl.ay+z*pl.az,b:x*pl.bx+y*pl.by+z*pl.bz}}
+function gashIn(w,q,m){return slF(w.K,q.a)-q.b>-(m===undefined?.004:m)}
+function gashCross(TH,w,A,B){if(!gashPl(w))return null;const k=TH.t.k,qa=gashSide(w,k,A.p),qb=gashSide(w,k,B.p);
+ if(qa.s*qb.s>=0||Math.abs(qa.s)<.0012||Math.abs(qb.s)<.0012||Math.abs(qa.s)>.025||Math.abs(qb.s)>.025)return null;
+ const X=A.p.clone().lerp(B.p,qa.s/(qa.s-qb.s));if(!gashIn(w,gashSide(w,k,X)))return null;if(w.sew&&w.sew.xs&&w.sew.xs.some(x=>x.distanceTo(X)<.0025))return null;return{X,sc:0}}
+// длина щели: кольцо кожи вокруг части там, где рана, — где проекция на плоскость попадает в прорубленное
+function gashNeed(w){const k=w.part,pl=gashPl(w);profInit();if(!pl||!PROF[k]){w.macN=5;w.macPts=[];return 5}
+ const d=DOLLS.find(q=>q.wounds.indexOf(w)>=0),S=d&&d.sl;let off=null;if(S)for(let i=0;i<S.used;i++){const I=S.bi[i];if(I&&I.b===w.b){off=I.off;break}}
+ const c=w.lp,y=c.y+(off?off.y:0),r={};profAt(k,y,r);const t={k,cap:null},q=new V3(),sn=new V3(),R0=[],NS=64;
+ // точка кольца — на плоскость разреза и обратно на кожу (2 раза): щель на коже = плоскость ∩ кожа, даже если клинок шёл косо
+ const pn=new V3(pl.nx,pl.ny,pl.nz);
+ for(let i=0;i<NS;i++){const a=i/NS*TAU,sp=new V3();q.set(r.cx+Math.cos(a)*r.rx,y,r.cz+Math.sin(a)*r.rz);let m=null;
+  for(let it=0;it<3;it++){skinAt(t,q,sp,sn);m=gashSide(w,k,sp);if(Math.abs(m.s)<.0008)break;q.copy(sp).addScaledVector(pn,-m.s)}
+  R0.push({p:sp,cut:Math.abs(m.s)<.005&&gashIn(w,m,0)})}
+ // по кругу — с первой прорубленной точки после целой: щель одним куском (не перескакивать через целую сторону)
+ let st=R0.findIndex((e,i)=>e.cut&&!R0[(i+NS-1)%NS].cut);if(st<0)st=0;const pts=[];let L=0;
+ for(let j=0;j<NS;j++){const e=R0[(st+j)%NS];if(!e.cut){if(pts.length)break;continue}if(pts.length)L+=pts[pts.length-1].distanceTo(e.p);pts.push(e.p)}
+ w.macL=L;w.macPts=pts;return w.macN=clamp(Math.round(L/.016),2,6)}
+// зашитая рана мачете: края щели — на место, стенки разреза спрятаны
+function gashClose(d,w){const K=w.K,S=d.sl;if(!K||!S||K.closed)return;if(S.K===K){K.eng=false;slBakeK(d)}if(!K.bk)return;K.closed=true;
+ for(const key in K.bk){const m=S.M[key],B=K.bk[key];if(!m)continue;for(let i=0;i<B.v.length;i++){const v=B.v[i];if(v>=m.n)continue;m.P[3*v]-=B.o[3*i];m.P[3*v+1]-=B.o[3*i+1];m.P[3*v+2]-=B.o[3*i+2]}
+  for(let t=B.t0;t<B.t1&&t<m.TM.length;t++)m.TM[t]=255;S.dirty.add(key)}
+ slFlush(d);d._sp=null}
+// v63: стежок прошёл мимо — если укол был у самой раны (до 1,4 см) и игла прошла дугу (≥ 50°), стежок ложится поперёк раны там, где колол
+function stitchAssist(TH,A,B,phi){if(phi<.85)return null;const d=TH.d,t=TH.t;let best=null,bd=.014;
+ for(const w of d.wounds){if(w.own||w.sewn||w.healed||w.seam||w.lodge)continue;if(woundBody(d,w)!==t.b)continue;const g=sewGeo(TH,w,A.p);if(g&&g.dist<bd){bd=g.dist;best=g}}
+ if(!best)return null;const P0=best.C.clone().addScaledVector(best.v,.005*best.s),P1=best.C.clone().addScaledVector(best.v,-.005*best.s);
+ return[thPt(TH,t,fromProf(t,P0,new V3())),thPt(TH,t,fromProf(t,P1,new V3()))]}
+// где класть стежок у этой раны от точки укола p (координаты сечения нити): центр C на коже, поперёк — v, сторона укола — s
+function sewGeo(TH,w,p){const t=TH.t,C=new V3(),n=new V3(),u=new V3(),xs=w.sew&&w.sew.xs||[];
+ const free=X=>!xs.some(x=>x.distanceTo(X)<.0028);
+ if(isGash(w)){const q=gashSide(w,t.k,p);if(Math.abs(q.s)>.02)return null;const pl=gashPl(w),pn=new V3(pl.nx,pl.ny,pl.nz);
+  const X=p.clone().addScaledVector(pn,-q.s);skinAt(t,X,C,n);if(!gashIn(w,gashSide(w,t.k,C),.002))return null;const v=pn.clone().addScaledVector(n,-pn.dot(n));if(v.lengthSq()<1e-8)return null;v.normalize();
+  u.crossVectors(n,v).normalize();for(let i=0;i<4&&!free(C);i++)C.addScaledVector(u,.003*(i%2?-1:1)*(i+1));return{C,v,s:q.s<0?-1:1,dist:Math.abs(q.s)}}
+ const lr=woundLine(TH,w,C,n,u);if(!lr)return null;
+ if(lr===true){const hl=w.cut&&!w.blunt?(w.knife?.024:.03):.0075,al=clamp(THU.subVectors(p,C).dot(u),-hl,hl);C.addScaledVector(u,al);skinAt(t,C.clone(),C,n);
+  const v=new V3().crossVectors(n,u).normalize(),sv=THU.subVectors(p,C).dot(v),dist=Math.abs(sv);for(let i=0;i<4&&!free(C);i++)C.addScaledVector(u,.003*(i%2?-1:1)*(i+1));return{C,v,s:sv<0?-1:1,dist}}
+ // дырка: поперёк — от укола через центр; следующие стежки — рядом (зигзаг)
+ skinAt(t,C.clone(),C,n);const dist=p.distanceTo(C),v=C.clone().sub(p);v.addScaledVector(n,-v.dot(n));if(v.lengthSq()<4e-6){v.crossVectors(n,new V3(0,1,0));if(v.lengthSq()<1e-6)v.crossVectors(n,new V3(1,0,0))}v.normalize();
+ u.crossVectors(n,v).normalize();const k=xs.length,o=[0,.0028,-.0028,.0056,-.0056][k%5];C.addScaledVector(u,o);return{C,v,s:-1,dist}}
+
 // шов пришитого: через линию стыка (кольцо у сустава или по срезу), стежки — по кругу (не в одном месте)
 function seamCross(TH,A,B){const rec=TH.rec;if(rec.done)return null;const t=seamT(rec);if(!t)return null;const a=toProf(t,A.w,new V3()),b=toProf(t,B.w,new V3()),y0=seamY(rec,t),sA=a.y-y0,sB=b.y-y0;
  if(sA*sB>0||Math.abs(sA-sB)<.004||A.w.distanceTo(B.w)>.036)return null;const X=a.clone().lerp(b,sA/(sA-sB));profAt(t.k,y0,WPO);const th=Math.atan2((X.z-WPO.cz)/WPO.rz,(X.x-WPO.cx)/WPO.rx);
@@ -5555,7 +5757,7 @@ function thCut(TH,how){if(!TH)return;const d=TH.d;if(MED.su&&MED.su.th===TH)MED.
  if(TH.P.length>=2){const q=TH.P[TH.P.length-1],p0=TH.P[TH.P.length-2],dr=q.p.clone().sub(p0.p);dr.addScaledVector(q.n,-dr.dot(q.n));if(dr.lengthSq()<1e-10)dr.set(1,0,0);dr.normalize();
   const k=new THREE.Mesh(SUTK,SUTM);k.scale.setScalar(.0013);k.position.copy(q.p).addScaledVector(q.n,.0009);TH.D.c.add(k);thSeg(TH.D,q.p,q.n,q.p.clone().addScaledVector(dr,.0045),q.n,false)}
  let n=0;for(const w of TH.ws){if(w.sewn||!w.sew||w.sew.n<w.sew.N)continue;w.sewn=true;w.healT=0;w.rate=Math.min(w.rate*.06,.0003);w.art=false;w.vj=0;w.tau=Math.min(w.tau||1e9,15);n++;
-  if(isStumpW(w)){const P=d.P[w.part];if(P&&P.g)try{stumpWrap(d,w)}catch(e){}}try{statAdd('sw')}catch(e){}sewMark(d,w,true)}
+  if(isStumpW(w)){const P=d.P[w.part];if(P&&P.g)try{stumpWrap(d,w)}catch(e){}}if(isGash(w))try{gashClose(d,w)}catch(e){bugLog('gashClose',e)}try{statAdd('sw')}catch(e){}sewMark(d,w,true)}
  const rec=TH.rec;if(rec&&!rec.done&&rec.n>=rec.N){seamDone(rec);return}if(rec&&rec.done)return;
  if(n)toast(n>1?'Нить обрезана — раны зашиты':isStumpW([...TH.ws].find(w=>w.sewn)||{})?'Культя зашита':'Нить обрезана — рана зашита');
  else if(TH.xs&&how!=='quiet')toast('Нить обрезана — шов не закончен')}
@@ -5566,7 +5768,9 @@ function segDist(p,a,b){THV.subVectors(b,a);const L2=THV.lengthSq();let f=L2>1e-
 // Отвёл руку от иглы — игла вышла назад. Следующий укол — рядом с выходом, чуть дальше вдоль раны: нить ложится зигзагом.
 const SUT=new V3(),SUP=new V3(),SUW=new V3(),SUV=new V3(),SUC=new V3(),SUX=new V3(),SUY=new V3(),SUZ=new V3(),SUR=new Q4(),SUR2=new Q4(),SUM4=new THREE.Matrix4(),SUM5=new THREE.Matrix4(),SUM6=new THREE.Matrix4(),SUQ4=new Q4();
 function sewTarget(t,P){// какая рана у точки P (в мире) на этом теле: незашитая, не дальше 3 см по коже
- const d=t.d;let best=null,bd=.03;for(const w of d.wounds){if(w.own||w.sewn||w.healed||w.seam)continue;if(woundBody(d,w)!==t.b)continue;if(!woundS(t,w,SUW))continue;fromProf(t,SUW,SUP);const q=SUP.distanceTo(P);if(q<bd){bd=q;best=w}}return best}
+ const d=t.d;let best=null,bd=.03;for(const w of d.wounds){if(w.own||w.sewn||w.healed||w.seam)continue;if(woundBody(d,w)!==t.b)continue;
+  if(isGash(w)){toProf(t,P,SUW);const q=gashSide(w,t.k,SUW);if(!gashIn(w,q,.008))continue;const dd=Math.abs(q.s);if(dd<bd){bd=dd;best=w}continue}
+  if(!woundS(t,w,SUW))continue;fromProf(t,SUW,SUP);const q=SUP.distanceTo(P);if(q<bd){bd=q;best=w}}return best}
 function suLocal(){const o=MEDK.sut,u=o.userData;if(u.tipH)return;o.updateMatrixWorld(true);u.tipH=o.worldToLocal(u.tipO.getWorldPosition(new V3()));u.swH=o.worldToLocal(u.swO.getWorldPosition(new V3()))}
 function suUnpin(U,R){U.pin=null;U.out=false;if(R&&R.model)hNomApply(R);medGrip()}
 function vrSuture(dt){const R=VR.R;if(!R||!R.src)return;const U=MED.su||(MED.su={pin:null,th:null,hT:0,out:true}),o=MEDK.sut,u=o.userData;U.hT-=dt;
@@ -5577,7 +5781,7 @@ function vrSuture(dt){const R=VR.R;if(!R||!R.src)return;const U=MED.su||(MED.su=
  if(U.th&&U.th.P.length){thLastW(U.th,SUX);if(U.pin)thW(U.th,U.pin.A,SUY);else u.swO.getWorldPosition(SUY);
   // нить не бесконечная: отошёл с иглой дальше 80 см — обрезается сама (узел на последнем стежке)
   if(SUX.distanceTo(SUY)>.8){thCut(U.th,'auto');SUFREE.visible=false}else cylAt(SUFREE,SUX,SUY,.0005)}else SUFREE.visible=false}
-function suFind(U,R){const t=medNear(SUT,.004),inn=!!(t&&t.dist<-.0012),fresh=inn&&U.out;U.out=!inn;if(!fresh)return;
+function suFind(U,R){const t=medNearSkin(SUT,.004),inn=!!(t&&t.dist<-.001),fresh=inn&&U.out;U.out=!inn;if(!fresh)return;
  t.cap=t.cap||partCap(t.d,t.b,t.k,t.I);const tt={b:t.b,k:t.k,off:t.off,cap:t.cap,I:t.I,d:t.d};
  // пришить: оторванная часть у культи (держишь рукой рядом, ближе 12 см) — встаёт на место; дальше — шов через линию стыка
  for(const c of sevCands(t.d)){if(c.A!==t.b&&c.B!==t.b)continue;const dd=candDist(c);
@@ -5603,7 +5807,7 @@ function suPin(U,R,dt){const I=U.pin,t=I.t,o=MEDK.sut,u=o.userData;if(DOLLS.inde
  const PMAX=Math.PI*.96;phi=clamp(phi,0,PMAX);const dp=phi-I.phi;I.phi=phi;
  // иглодержатель повёрнут вокруг центра дуги на −φ (в своей системе)
  SUM6.makeRotationAxis(u.na,-phi);SUM5.makeTranslation(u.nc.x,u.nc.y,u.nc.z).multiply(SUM6).multiply(SUM6.makeTranslation(-u.nc.x,-u.nc.y,-u.nc.z));SUM5.premultiply(SUM4);
- toolShow(R,o,SUM5);const tip=SUX.copy(u.tipH).applyMatrix4(SUM5),pd=profDepth(t.k,t.cap,toProf(t,tip,SUY));I.maxD=Math.max(I.maxD,pd);
+ toolShow(R,o,SUM5);const tip=SUX.copy(u.tipH).applyMatrix4(SUM5),pd=skinDepthT(t,toProf(t,tip,SUY));I.maxD=Math.max(I.maxD,pd);
  if(dp>.01){I.vT-=dt;if(I.vT<=0){I.vT=.07;vrPulse(R,clamp(.18+dp/Math.max(dt,1e-3)*.06,.18,.55),14)}}
  // вышла с другой стороны (или ушла вся) — стежок
  const out=(I.maxD>.0012&&pd<=0&&phi>.3)||(I.maxD>.002&&phi>Math.PI*.62)||phi>=PMAX-1e-3;
@@ -5611,7 +5815,8 @@ function suPin(U,R,dt){const I=U.pin,t=I.t,o=MEDK.sut,u=o.userData;if(DOLLS.inde
  const far=SUT.distanceTo(tip)>.08;
  if(out||(far&&phi>1.3&&I.maxD>.002)){// выход — на коже того тела, на котором точка ближе к кончику (у пришитого — может быть по ту сторону стыка)
   let B=thPt(U.th,t,tip);const q=medNear(tip,.006);if(q&&q.d===t.d&&q.b!==t.b){q.cap=q.cap||partCap(q.d,q.b,q.k,q.I);const B2=thPt(U.th,{b:q.b,k:q.k,off:q.off,cap:q.cap,I:q.I,d:q.d},tip);if(B2.w.distanceTo(tip)<B.w.distanceTo(tip))B=B2}
-  const r=thCross(U.th,I.A,B);vrPulse(R,.55,26);if(!r&&U.hT<=0){U.hT=2.5;toast(U.th.rec?'Шей через линию стыка':'Стежок не прошёл через рану')}suUnpin(U,R);return}
+  let A=I.A;if(!U.th.rec&&!woundCrossFind(U.th,A,B)){const as=stitchAssist(U.th,A,B,phi);if(as){A=as[0];B=as[1]}}
+  const r=thCross(U.th,A,B);vrPulse(R,.55,26);if(!r&&U.hT<=0){U.hT=2.5;toast(U.th.rec?'Шей через линию стыка':'Стежок не прошёл через рану')}suUnpin(U,R);return}
  if(far){suUnpin(U,R);vrPulse(R,.2,12);if(U.hT<=0){U.hT=3;toast('Поверни кисть — игла выйдет с другой стороны раны')}}}
 // ножницы в левой руке: курок сводит лезвия; у нити — режет
 function scissorsUpd(dt){const L=VR.L,show=!!(VR.on&&wi===WI_MED&&MEDT[MED.t].id==='sut'&&L&&L.src&&!L.g&&!L.g2);MEDL.visible=show;if(!show){MED.scT=0;return}
@@ -5638,6 +5843,11 @@ function sew2Step(rdt){const A=MED.sew2;if(!A)return;const d=A.d;if(DOLLS.indexO
   thCross(A.TH,thPt(A.TH,ta,a),thPt(A.TH,tb2,b));if(d.alive)d.pain=Math.min(100,d.pain+3);
   if(rec.n>=rec.N||A.TH.bad>4){thCut(A.TH,'auto');medSfx('snip');MED.sew2=null}return}
  const w=A.w;if(w.sewn){if(A.TH)thCut(A.TH,'auto');MED.sew2=null;return}const t=bodyT(d,woundBody(d,w));if(!t){MED.sew2=null;return}if(!A.TH)A.TH=thNew(t,null);
+ if(isGash(w)){const N=sewNeed(w),pts=w.macPts||[],n0=(w.sew?w.sew.n:0)+A.TH.bad;if(!pts.length||n0>=N+3){thCut(A.TH,'auto');MED.sew2=null;return}
+  const P0=pts[Math.min(pts.length-1,Math.round((.1+.8*((n0%N)+.5)/N)*(pts.length-1)))],sp=new V3(),sn=new V3();skinAt(t,P0.clone(),sp,sn);const pl=gashPl(w),pn=new V3(pl.nx,pl.ny,pl.nz);pn.addScaledVector(sn,-pn.dot(sn));if(pn.lengthSq()<1e-8){MED.sew2=null;return}pn.normalize();
+  const gu=new V3().crossVectors(sn,pn).normalize(),s=n0%2?-1:1,a=fromProf(t,sp.clone().addScaledVector(pn,.0058*s),new V3()),b=fromProf(t,sp.clone().addScaledVector(pn,-.0058*s).addScaledVector(gu,.004),new V3());
+  thCross(A.TH,thPt(A.TH,t,a),thPt(A.TH,t,b));if(d.alive)d.pain=Math.min(100,d.pain+3);
+  if((w.sew&&w.sew.n>=w.sew.N)||A.TH.bad>3){thCut(A.TH,'auto');medSfx('snip');MED.sew2=null}return}
  if(!woundS(t,w,SWP)){MED.sew2=null;return}wrapProj(t.k,t.cap,SWP,SWA,SWN);
  // линия раны: у разреза — к соседней ране того же разреза, иначе — вдоль части
  let u=null;{const C=new V3(),n=new V3(),uu=new V3();if(woundLine(A.TH,w,C,n,uu)===true)u=uu.clone()}
@@ -5988,7 +6198,7 @@ function bluntHit(d,k,P,N,V,o){const K=o.K||BKIND[o.kind],P0=d.P[k];if(!K||!P0||
  // запись в карту травм
  const nm=partName(k,zone,rp),r0=d.shots[0],out=E<8?'лёгкий удар':E<25?'удар':E<55?'сильный удар':'очень сильный удар';
  if(r0&&r0.bl&&r0.w===K.n&&r0.part===nm&&TNOW-r0.t<5){for(const s of inj)if(r0.org.indexOf(s)<0)r0.org.push(s);r0.n++;r0.t=TNOW;r0.out=out+' ×'+r0.n}
- else{d.shots.unshift({w:K.n,part:nm,org:inj.length?inj:[E<8?'покраснение':'кровоподтёк'],out,bl:true,t:TNOW,n:1});if(d.shots.length>3)d.shots.pop()}
+ else{injAdd(d,{w:K.n,part:nm,org:inj.length?inj:[E<8?'покраснение':'кровоподтёк'],out,bl:true,t:TNOW,n:1},k)}
  return{E,zone,inj}}
 
 // ---- толчок: рука (оружие) медленно давит на стоящего — он подаётся, переступает, не удержался — падает ----
@@ -6090,7 +6300,7 @@ function chokeUpd(dt){let tg=null,s=0;
   if(!d.chokeOn&&d.chk>0&&d.alive)d.chk=Math.max(0,d.chk-dt*1.6);
   if(!d.chokeOn&&d.cong>0)d.cong=Math.max(0,d.cong-dt*.005);
   if(d.face&&d.face.cy>0&&!d.chokeOn)d.face.cy=Math.max(0,d.face.cy-dt*.05)}}
-function chokeOn(d,s,dt){if(!d.chokeOn){d.chokeOn=true;d.chT=0;const r0=d.shots[0];if(!(r0&&r0.ch)){d.shots.unshift({w:'Руки',part:'Шея',org:['удушение'],out:'сдавление шеи',ch:true});if(d.shots.length>3)d.shots.pop()}}
+function chokeOn(d,s,dt){if(!d.chokeOn){d.chokeOn=true;d.chT=0;const r0=d.shots[0];if(!(r0&&r0.ch)){injAdd(d,{w:'Руки',part:'Шея',org:['удушение'],out:'сдавление шеи',ch:true},'head')}}
  d.chT+=dt;sel=d;if(!d.alive)return;
  d.chk=(d.chk||0)+dt*s*1.15;d.cong=Math.min(1,(d.cong||0)+dt*s*.11);d.fear=1;d.pain=Math.max(d.pain,35);if(d.face)d.face.cy=clamp((d.chk-4)/14,0,.75);
  // пока в сознании — сопротивляется: хватает за руки на шее, бьётся
@@ -6494,10 +6704,11 @@ function postRag(d,dt){const held=isHeld(d),cr=d.rag&&(d.st==='crawl'||d.st==='t
   if(!d.rag&&!P.loose)continue;if(held)continue;if(cr&&(d.rolling||k==='chest'||k==='belly'||k==='pelvis'||k==='head'||k==='laL'||k==='laR'))continue;if(d.lrOn&&!(d.lrRest>0)&&k[1]!=='a')continue;
   const gy=groundY(b.position.x,b.position.z,b.position.y);
   if(b.position.y-gy<.2){const hs=Math.hypot(v.x,v.z),f=Math.max(0,1-(cr?3:(hs<.5?12:4.5))*dt);v.x*=f;v.z*=f;b.angularVelocity.scale(Math.max(0,1-(cr?2:4)*dt),b.angularVelocity)}}}
-function loop(now){const rdt=Math.min((now-last)/1000,.05),dt=paused?0:rdt*TSC;last=now;try{frame(rdt,dt)}catch(e){bugLog('frame',e)}try{rd.render(scene,cam)}catch(e){bugLog('render',e)}}
+function loop(now){if(gfxSkip(now))return;try{gfxTick(now)}catch(e){}const rdt=Math.min((now-last)/1000,.05),dt=paused?0:rdt*TSC;last=now;try{frame(rdt,dt)}catch(e){bugLog('frame',e)}try{rd.render(scene,cam)}catch(e){bugLog('render',e)}}
 function frame(rdt,dt){
+ try{gpPoll(rdt)}catch(e){bugLog('gp',e)}
  if(VR.on)try{vrBlock()}catch(e){bugLog('vrBlock',e)}
- if(!lowQ&&!paused&&!VR.on){perfT+=rdt;perfN++;if(perfT>4){if(perfN/perfT<30&&(window.devicePixelRatio||1)>1){lowQ=true;rd.setPixelRatio(1)}perfT=0;perfN=0}}
+ if(!lowQ&&!paused&&!VR.on&&!GFX.res){perfT+=rdt;perfN++;if(perfT>4){if(perfN/perfT<30&&(window.devicePixelRatio||1)>1){lowQ=true;rd.setPixelRatio(1)}perfT=0;perfN=0}}
  if(!paused)try{updPlayer(rdt);plBump(dt);aimT-=rdt;if(aimT<=0){aimT=.15;pickAim()}}catch(e){bugLog('player',e)}
  cool-=dt;if(!paused&&trig&&cool<=0&&(WPN[wi].auto||trigNew)){try{shoot()}catch(e){bugLog('shoot',e)}trigNew=false}
  if(!paused)try{medFrame(rdt,dt)}catch(e){bugLog('med',e)}
@@ -6537,7 +6748,7 @@ function warmShaders(){try{if(!WARM.parent){scene.add(WARM);const G=new THREE.Pl
  rd.compile(scene,cam)}catch(e){bugLog('warm',e)}}
 for(let i=0;i<5;i++)spawnDoll();sel=null;try{sknBuild()}catch(e){bugLog('skin',e)}warmShaders();
 function tele(d,x,z,h){d.x=x;d.z=z;d.path=null;if(h!==undefined)d.h=h;d.gy=groundY(x,z,0);animate(d,0);fk(d);for(const def of PD){const P=d.P[def.n],T=P.pose;P.b.position.set(T.p.x,T.p.y,T.p.z);P.b.quaternion.set(T.q.x,T.q.y,T.q.z,T.q.w);P.b.velocity.set(0,0,0);P.b.angularVelocity.set(0,0,0)}syncMeshes(d)}
-window.__G={wrapProj,suPin,suFind,MEDK,MEDL,SUFREE,thNew,thPt,thCross,thCut,woundCross,seamCross,seamDone,scissorsUpd,suUnpin,injOut,toolShow,gripFwd,twCoatUpd,lodgeDv,slGrabMove,segDist,groupMove,medLodge,vrTweezers,twOpen,twClose,twMove,twUp,twTick,TWG,TWS,probeSnd,chanAt,lodgeOut,bulletMesh,BDROP,bulletsUpd,medGrip,medPal,medLegend,sevCands,candGoal,candDist,candGroup,reattach,seamAdd,seamT,seamY,seamPt,sewAdd,sewNeed,sew2Start,sew2Step,vrSuture,healStep,holdCheck,wrapHits,DECO,decoFor,bodyT,skinRestore,stumpHide,stitchW,medAttach,medModel,woundS,wrapTint,bleed,medPick,wrapTail,setTrig:v=>{trig=v;trigNew=v},PROF:()=>PROF,profInit,profAt,medNear,partCap,profDepth,wrapNew,wrapAdd,wrapEnd,wrapCover,autoStart,autoStep,WRAPS,vrInject,syrShow,inj2Step,medBodies,toProf,fromProf,vrCPR,supine,rollBack,WI_MED,MED,MEDT,MEDG,medShoot,medSel,medBandage,medInject,medBag,medCPR,cprPress,cprRate,cprOn,revivable,rosc,medFrame,lyingD,ivFree,STS,STT,statAdd,statLimbs,stOnNow,openSt,closeSt,dismember,headBurst,die,slLoose,vrStats,sfxShot,sfxPump,casSnd,sfxStab,sfxKnifeBone,sfxPull,sfxSlash,sfxFlesh,sfxChop,sfxSever,sfxSaw,sndBump,sndDrip,SAWV,slMat,slRayFix,pieceRest,sym3eig,SND,SGEN,sndBank,sndPlay,sfxBlunt,sfxStep,sndLooseHit,sndDropHit,shoePrint,footStep,poolAt,flatSurf,toPx,newPool,feedPool,SURF,groundY,macIn,slToBind,acx:()=>ac(),slIsl,slFragFind,slFrag,slFragPiece,slComps,slFind,slPts,slFitB,slCC,slWv,kLockUp,kHold,kStuck,slFix,slTear,slMoved,slNC,slMerge,syncPc,slSurf,vrSurf,slLoops,slEar,slF,SLP,MGRP,WI_MAC,MCS,MCB,macBlade,macCaps,macShoot,mac2D,macFrame,slInit,slStart,slRefresh,slBakeK,slOut,slTopo,slLoose,slPoly,SLX,SLEL,ANAT,PD,PDM,BI,MBL,macProf,DMESH,ENV,RC,CEN,isDesc,kLockCon,kLockForce,skinProxyGeo,proxy,KN,kDetect,startFallStep,sfxWhoosh,warmShaders,WARM,fracture,skullCrack,ribCrack,clavCrack,hipCrack,pelvisCrack,coccyxCrack,vertCrack,heelCrack,fingerCrack,jointCrack,shotCrack,CRK,CRKH,XR,ANATP,grabStand,grabThink,gbRelease,throwCap,conForce,GBSOFT,gbPull,SKN,sknBuild,skinR,skinRb,sknR,dCaps,BUGS,bugLog,fallImpact,fallProc,fallSlide,FIQ,handFine,fallKind,FLM,jointFix,dblPrep,wBloodAt,WBALL,WBH,wpnHit,wbFrame,jointBreak,jointShot,dblFric,fistBlood,gLim,pelletDir,partHeld,bluntHit,meleeUpd,BKIND,bZone,pushAcc,chokeUpd,SG,RCL,CAS,SMK,FLL,FLX,HGRP,FIST,WI_HAND,WI_HAM,hinge4,swell,headHi,M2,meleeShoot,mStrikers,dCaps,gunFx,sgReady,CYC,bzRender,lacAt,RB,chokeMarks,chokeOn,body34,casingOut,smoke,HB,vrBlock,blkList,thickGeo,torsoSite,openLimb,stumpTex,peelSet,FLAPS,LZ,vrHand,GHO,gunHoldM,gunHand,hConform,dollCaps,capHit,boxHit,vrHandM,vrSurf,vrTouch,kHold,lockCon,GTRG,vrColUpd,gunSupport,gunSupOff,hApply,kCutEnd,cutAt,kCutStart,kCutVes,kCutSeg,KNOM,kPlace,handTilt,HQT,HOFF,knifePoseVR,VR,VP,VRC,vrBtns,vrStart,vrEnd,vrPanel,aimRay,vrNear,vrSeat,resetScene,KN,KB,KGRP,KCOAT,handsClean,handBlood,handHit,partBlood,knifeMark,knifeUpd,kStab,knife2D,knifeOut,knifeGrip,knifeClean,knifeAttach,bodySeen,scream,alertAround,BODYST,RAMPS,SURFM,obSurfs,collide,skinTint,witness,GM,GUN,DOLLS,PL,PT,SURF,BDRIPS,CFG,tele,shoot,setW,spawnDoll,grabStart,grabEnd,drawSplat,stamp,FLOOR,cam,world,getUp,toRag,dismember,preset,setXr,traverse,WPN,hearShot,perceive,startGetup,startFlee,toSit,wallSpot,astar,goTo,NG,POSE,dollBlocked,decide,sim,soakPart,endCoat,gibMark,drawPool,setEVY:v=>{EVY=v},smearStroke,transfer,playerStep,dripOff,skinTone,splatHit,accum,newPool,feedPool,emit,gunSpatter,pressOf,poolAge,SURF,addWound,woundMark,rdr:()=>rd,scn:()=>scene,frame,flushTex,SELFC,selfOverlap,startFallStep,ragMuscles,pause:v=>{paused=v},faceStartle,lieReact,startStagger,headBurst,clearGibs,GIBS,TILES,chooseCover,smearStroke,ac,footStep,FLOWS,HASFILTER,setLang,tr,breathe,twitch,startTwitch};
+window.__G={injAdd,injSev,medUpd,MEDF,tel0,medVR,medPanel,woundW,skinHitP,skinKeys,isGash,gashNeed,skinDepthT,medNearSkin,profGet:k=>{profInit();return PROF[k]},wrapProj,suPin,suFind,MEDK,MEDL,SUFREE,thNew,thPt,thCross,thCut,woundCross,seamCross,seamDone,scissorsUpd,suUnpin,injOut,toolShow,gripFwd,twCoatUpd,lodgeDv,slGrabMove,segDist,groupMove,medLodge,vrTweezers,twOpen,twClose,twMove,twUp,twTick,TWG,TWS,probeSnd,chanAt,lodgeOut,bulletMesh,BDROP,bulletsUpd,medGrip,medPal,medLegend,sevCands,candGoal,candDist,candGroup,reattach,seamAdd,seamT,seamY,seamPt,sewAdd,sewNeed,sew2Start,sew2Step,vrSuture,healStep,holdCheck,wrapHits,DECO,decoFor,bodyT,skinRestore,stumpHide,stitchW,medAttach,medModel,woundS,wrapTint,bleed,medPick,wrapTail,setTrig:v=>{trig=v;trigNew=v},PROF:()=>PROF,profInit,profAt,medNear,partCap,profDepth,wrapNew,wrapAdd,wrapEnd,wrapCover,autoStart,autoStep,WRAPS,vrInject,syrShow,inj2Step,medBodies,toProf,fromProf,vrCPR,supine,rollBack,WI_MED,MED,MEDT,MEDG,medShoot,medSel,medBandage,medInject,medBag,medCPR,cprPress,cprRate,cprOn,revivable,rosc,medFrame,lyingD,ivFree,STS,STT,statAdd,statLimbs,stOnNow,openSt,closeSt,dismember,headBurst,die,slLoose,vrStats,sfxShot,sfxPump,casSnd,sfxStab,sfxKnifeBone,sfxPull,sfxSlash,sfxFlesh,sfxChop,sfxSever,sfxSaw,sndBump,sndDrip,SAWV,slMat,slRayFix,pieceRest,sym3eig,SND,SGEN,sndBank,sndPlay,sfxBlunt,sfxStep,sndLooseHit,sndDropHit,shoePrint,footStep,poolAt,flatSurf,toPx,newPool,feedPool,SURF,groundY,macIn,slToBind,acx:()=>ac(),slIsl,slFragFind,slFrag,slFragPiece,slComps,slFind,slPts,slFitB,slCC,slWv,kLockUp,kHold,kStuck,slFix,slTear,slMoved,slNC,slMerge,syncPc,slSurf,vrSurf,slLoops,slEar,slF,SLP,MGRP,WI_MAC,MCS,MCB,macBlade,macCaps,macShoot,mac2D,macFrame,slInit,slStart,slRefresh,slBakeK,slOut,slTopo,slLoose,slPoly,SLX,SLEL,ANAT,PD,PDM,BI,MBL,macProf,DMESH,ENV,RC,CEN,isDesc,kLockCon,kLockForce,skinProxyGeo,proxy,KN,kDetect,startFallStep,sfxWhoosh,warmShaders,WARM,fracture,skullCrack,ribCrack,clavCrack,hipCrack,pelvisCrack,coccyxCrack,vertCrack,heelCrack,fingerCrack,jointCrack,shotCrack,CRK,CRKH,XR,ANATP,grabStand,grabThink,gbRelease,throwCap,conForce,GBSOFT,gbPull,SKN,sknBuild,skinR,skinRb,sknR,dCaps,BUGS,bugLog,fallImpact,fallProc,fallSlide,FIQ,handFine,fallKind,FLM,jointFix,dblPrep,wBloodAt,WBALL,WBH,wpnHit,wbFrame,jointBreak,jointShot,dblFric,fistBlood,gLim,pelletDir,partHeld,bluntHit,meleeUpd,BKIND,bZone,pushAcc,chokeUpd,SG,RCL,CAS,SMK,FLL,FLX,HGRP,FIST,WI_HAND,WI_HAM,hinge4,swell,headHi,M2,meleeShoot,mStrikers,dCaps,gunFx,sgReady,CYC,bzRender,lacAt,RB,chokeMarks,chokeOn,body34,casingOut,smoke,HB,vrBlock,blkList,thickGeo,torsoSite,openLimb,stumpTex,peelSet,FLAPS,LZ,vrHand,GHO,gunHoldM,gunHand,hConform,dollCaps,capHit,boxHit,vrHandM,vrSurf,vrTouch,kHold,lockCon,GTRG,vrColUpd,gunSupport,gunSupOff,hApply,kCutEnd,cutAt,kCutStart,kCutVes,kCutSeg,KNOM,kPlace,handTilt,HQT,HOFF,knifePoseVR,VR,VP,VRC,vrBtns,vrStart,vrEnd,vrPanel,aimRay,vrNear,vrSeat,resetScene,KN,KB,KGRP,KCOAT,handsClean,handBlood,handHit,partBlood,knifeMark,knifeUpd,kStab,knife2D,knifeOut,knifeGrip,knifeClean,knifeAttach,bodySeen,scream,alertAround,BODYST,RAMPS,SURFM,obSurfs,collide,skinTint,witness,GM,GUN,DOLLS,PL,PT,SURF,BDRIPS,CFG,tele,shoot,setW,spawnDoll,grabStart,grabEnd,drawSplat,stamp,FLOOR,cam,world,getUp,toRag,dismember,preset,setXr,traverse,WPN,hearShot,perceive,startGetup,startFlee,toSit,wallSpot,astar,goTo,NG,POSE,dollBlocked,decide,sim,soakPart,endCoat,gibMark,drawPool,setEVY:v=>{EVY=v},smearStroke,transfer,playerStep,dripOff,skinTone,splatHit,accum,newPool,feedPool,emit,gunSpatter,pressOf,poolAge,SURF,addWound,woundMark,rdr:()=>rd,scn:()=>scene,frame,flushTex,SELFC,selfOverlap,startFallStep,ragMuscles,pause:v=>{paused=v},faceStartle,lieReact,startStagger,headBurst,clearGibs,GIBS,TILES,chooseCover,smearStroke,ac,footStep,FLOWS,HASFILTER,setLang,tr,breathe,twitch,startTwitch};
 let I18N=null;const FLANG=LANG;
 function applyLang(){if(!I18N){I18N=[];const tw=document.createTreeWalker(document.body,NodeFilter.SHOW_TEXT);let n;while((n=tw.nextNode())){const p=n.parentNode;if(!p||p.closest('#tb,#toast,#wpn,#lRu,#lPl,#lEn,script,style'))continue;if(/[А-Яа-яЁё]/.test(n.nodeValue))I18N.push([n,n.nodeValue])}}
  for(const e of I18N)e[0].nodeValue=tr(e[1]);document.documentElement.lang=LANG;for(const L of LBL)drawLabel(L);drawSign();
@@ -6545,6 +6756,219 @@ function applyLang(){if(!I18N){I18N=[];const tw=document.createTreeWalker(docume
  setW(wi);telT=0;$('lRu').classList.toggle('on',LANG==='ru');$('lPl').classList.toggle('on',LANG==='pl');$('lEn').classList.toggle('on',LANG==='en')}
 function setLang(l){if(l===LANG)return;LANG=l;try{localStorage.setItem(LK,l)}catch(e){}applyLang()}
 $('lRu').onclick=()=>setLang('ru');$('lPl').onclick=()=>setLang('pl');$('lEn').onclick=()=>setLang('en');
+/* ================= v65: большое обновление — мачете ровно и уколом, куски берутся, аптечка по коже, геймпад, графика ================= */
+const V65={c:new CV(),c2:new CV(),v:new CV(),a:new V3(),b:new V3(),q:new Q4(),e:new THREE.Euler()};
+
+// ---- точное попадание по коже (как у мачете), ближайший манекен по лучу ----
+function skinRay(o,dir,far){let best=null;const P=new V3();
+ for(const d of DOLLS){if(!d.skin)continue;const pe=d.P.pelvis.b.position,t0=(pe.x-o.x)*dir.x+(pe.y-o.y)*dir.y+(pe.z-o.z)*dir.z,qx=o.x+dir.x*t0-pe.x,qy=o.y+dir.y*t0-pe.y,qz=o.z+dir.z*t0-pe.z;
+  if(qx*qx+qy*qy+qz*qz>2.6&&!(d.sl&&d.sl.pcs.length))continue;
+  const caps=macCaps(d),lim=best?best.s:far;
+  for(let s=.05;s<lim;s+=.01){P.copy(o).addScaledVector(dir,s);let hit=null;for(const C of caps)if(macIn(C,P)){hit=C;break}
+   if(hit){// уточняем вход в кожу
+    let a=s-.01,b=s;for(let i=0;i<5;i++){const m=(a+b)/2;P.copy(o).addScaledVector(dir,m);if(macIn(hit,P))b=m;else a=m}P.copy(o).addScaledVector(dir,b);best={d,C:hit,p:P.clone(),s:b};break}}}
+ return best}
+
+/* ---- 1. мачете без шлема: ровный удар (всегда справа налево по прицелу) и укол ---- */
+MCS.mode='chop';MCS.anim='chop';MCS.st=null;
+const MAQR=new Q4().setFromEuler(new THREE.Euler(.8,.38,1.4)),MAQW=new Q4().setFromEuler(new THREE.Euler(.02,-1.12,-1.5708)),MAQF=new Q4().setFromEuler(new THREE.Euler(0,1.02,-1.5708)),
+ MAQS=new Q4().setFromEuler(new THREE.Euler(.1,.25,-.4)),MAPR=new V3(.24,-.27,-.4);
+// false — анимация закончилась
+function macAnim2D(t){const G=MGRP;
+ if(t<0){G.quaternion.copy(MAQR);G.position.copy(MAPR);return false}
+ if(MCS.anim==='stab'){
+  if(t<.08){const k=smt(t/.08);G.quaternion.slerpQuaternions(MAQR,MAQS,k);G.position.set(.24-.04*k,-.27+.07*k,-.4+.1*k)}
+  else if(t<.17){const k=smt((t-.08)/.09);G.quaternion.copy(MAQS);G.position.set(.2-.08*k,-.2+.05*k,-.3-.34*k)}
+  else if(t<.27){G.quaternion.copy(MAQS);G.position.set(.12,-.15,-.64)}
+  else if(t<.5){const k=smt((t-.27)/.23);G.quaternion.slerpQuaternions(MAQS,MAQR,k);G.position.set(.12+.12*k,-.15-.12*k,-.64+.24*k)}
+  else{macAnim2D(-1);return false}return true}
+ // замах вправо, удар ровно справа налево, возврат
+ if(t<.09){const k=smt(t/.09);G.quaternion.slerpQuaternions(MAQR,MAQW,k);G.position.set(.24+.12*k,-.27+.13*k,-.4+.04*k)}
+ else if(t<.25){const u=(t-.09)/.16,k=smt(u);V65.e.set(.02-.02*k,-1.12+2.14*k,-1.5708);G.quaternion.setFromEuler(V65.e);G.position.set(.36-.58*k,-.14,-.36-.16*Math.sin(Math.PI*u))}
+ else if(t<.5){const k=smt((t-.25)/.25);G.quaternion.slerpQuaternions(MAQF,MAQR,k);G.position.set(-.22+.46*k,-.14-.13*k,-.36-.04*k)}
+ else{macAnim2D(-1);return false}return true}
+// укол без шлема: остриё входит в точку прицела вдоль взгляда
+function macStab2D(W){cool=.55;MCS.t=0;MCS.anim='stab';MCS.sw=null;sfxWhoosh(4);cam.updateMatrixWorld();
+ const o=new V3().setFromMatrixPosition(cam.matrixWorld),F=new V3();cam.getWorldDirection(F);const h=skinRay(o,F,1.9);
+ RC.setFromCamera(CEN,cam);RC.far=2.2;const e=RC.intersectObjects(ENV,false)[0];MCS.st=null;if(!h||(e&&e.distance<h.s))return;
+ const C=h.C,d=h.d,b=C.b,piece=!d.P[C.k]||d.P[C.k].b!==b;V65.c.set(h.p.x,h.p.y,h.p.z);const lp=b.pointToLocalFrame(V65.c);
+ const Rt=new V3().crossVectors(F,cam.up).normalize(),Up=new V3().crossVectors(Rt,F).normalize();
+ MCS.st={d,k:C.k,b,lp:new CV(lp.x,lp.y,lp.z),D:F.clone(),Up,piece,at:.12,out:.31,s:null}}
+function macStabHit2(st){const d=st.d,b=st.b;if(!DOLLS.includes(d)||!b||!b.world){MCS.st=null;return}
+ b.pointToWorldFrame(st.lp,V65.c);const E=new V3(V65.c.x,V65.c.y,V65.c.z);
+ if(st.piece){const J=2.2;b.applyImpulse(new CV(st.D.x*J,st.D.y*J,st.D.z*J),new CV(E.x,E.y,E.z));b.wakeUp();EMIT_SRC=d;gush(E,st.D.clone().negate(),4,.4,1.2,.6,3e-8,1.2e-7,0);EMIT_SRC=null;sfxStab();MCS.st=null;return}
+ const h0=KN.H.clone();KN.H.copy(st.Up);let s=null;try{s=kStab(d,st.k,E,st.D,3,false,.4,'Мачете')}catch(e){bugLog('macStab2',e)}KN.H.copy(h0);
+ if(!s){MCS.st=null;return}s.dep=Math.min(rnd(.1,.17),s.lim);s.max=s.dep;kDeep(s);st.s=s;
+ if(d.rag||d.P[st.k].loose){const J=Math.min(5,1.4+s.dep*18);b.applyImpulse(new CV(st.D.x*J,st.D.y*J,st.D.z*J),new CV(E.x,E.y,E.z))}}
+// клинок мачете выходит из раны: кровь следом за клинком, рана ещё выталкивает кровь, клинок в крови
+function macStabOut(s,V,vr){const d=s.d,w=s.w;if(!w)return;w.plug=false;if(!DOLLS.includes(d))return;const max=s.max||0,pv=(w.plugV||0)*1e-3;w.plugV=0;
+ if(max>.004){const art=w.art,b=s.b;b.pointToWorldFrame(s.lp,V65.c);const E=new V3(V65.c.x,V65.c.y,V65.c.z);b.vectorToWorldFrame(s.ld,V65.c);const SD=new V3(V65.c.x,V65.c.y,V65.c.z).normalize();
+  const TV2=V?V.clone():SD.clone().multiplyScalar(-1);const sv0=TV2.length();if(sv0>KBV)TV2.multiplyScalar(KBV/sv0);const sv=Math.min(sv0,KBV),n=Math.round(clamp(8+max*120+(art?12:0),10,40));EMIT_SRC=d;
+  for(let i=0;i<n;i++){const P1=E.clone().addScaledVector(SD,-rnd(0,.03)).addScaledVector(TV2,Math.random()*.02);runit();const v=TV2.clone().multiplyScalar(rnd(.25,.9)).addScaledVector(SD,-rnd(.12,.45)).addScaledVector(RU,.05+sv*.06);
+   const big=Math.random()<.2,vol=big?rnd(2e-7,6e-7):rnd(2e-8,1.2e-7);emit(P1,v,Math.min(.004,Math.cbrt(vol*.2387)),vol,art?(Math.random()<.7?2:0):(Math.random()<.6?5:0))}
+  EMIT_SRC=null;KN.gush.push({d,k:s.k,lp:s.lp,ln:w.ln,t:0,dur:rnd(.8,1.4)*(.6+Math.min(1,max*7)),art,vol:(.4+max*14)*1e-6+pv,acc:0});
+  w.rate+=(SOFTB[s.k.slice(0,2)]||.0005)*(.5+max*6);w.tau=Math.max(w.tau||0,300);MCB.liq=Math.min(1.6,MCB.liq+.25+max*4);
+  try{MGRP.updateMatrixWorld(true);const f0=Math.max(.55,1-max/.42);for(const f of[f0,(f0+1)/2,.98]){const z=MBL.z0+(MBL.z1-MBL.z0)*f,p=macProf(f);wBloodAt(MGRP,MGRP.localToWorld(new V3(0,(p[0]+p[1])/2,z)),null,.5+max*3)}}catch(e){}
+  if(vr&&VR.R)vrPulse(VR.R,.35,25)}
+ d.kimp=0;if(d.kcl){if(d.alive&&!d.rag)d.clutch=Math.max(d.clutch||0,d.kcl);d.kcl=0}
+ if(d.alive&&!d.rag&&d.st==='freeze')d.stateT=Math.min(d.stateT,.35)}
+// в шлеме: укол — остриё идёт вперёд вдоль клинка и входит в тело; клинок держится в ране (тело тянется за ним), пока не вытащишь
+const MST={s:null,t:-9};
+function macStabVR(P,VV,D,En,Fn,dt){const N=P.length,tip=P[N-1],vt=VV[N-1];const S=MST.s;
+ if(S){const d=S.d;if(!DOLLS.includes(d)||!d.P[S.k]||d.P[S.k].b!==S.b||!S.b.world){MST.s=null;return null}
+  const b=S.b;b.pointToWorldFrame(S.lp,V65.c);const E=new V3(V65.c.x,V65.c.y,V65.c.z);b.vectorToWorldFrame(S.ld,V65.c);const Dw=new V3(V65.c.x,V65.c.y,V65.c.z).normalize();
+  const rel=tip.clone().sub(E),ax=rel.dot(Dw),lat=rel.clone().addScaledVector(Dw,-ax),ll=lat.length();
+  // вынул (остриё вышло из кожи), рванул вбок или сильно повернул клинок
+  if(ax<.004||ll>.14||D.dot(Dw)<.5){macStabOut(S,vt.clone(),true);MST.s=null;MST.t=TNOW;return null}
+  const dep=Math.min(ax,S.lim);S.dep=dep;if(dep>S.max+1e-4){const was=S.max;S.max=dep;kDeep(S);if(VR.R&&dep-was>.004)vrPulse(VR.R,.25,12)}
+  // лежащее или отрубленное тянется за клинком
+  if(ll>.003&&(d.rag||d.P[S.k].loose)){V65.c2.set(E.x,E.y,E.z);kPtVel(b,V65.c2,V65.v);const want=lat.clone().multiplyScalar(Math.min(8,.55/Math.max(dt,1/120))),wl=want.length();if(wl>3)want.multiplyScalar(3/wl);
+   const dv=new V3(want.x-V65.v.x,want.y-V65.v.y,want.z-V65.v.z);dv.addScaledVector(Dw,-dv.dot(Dw));const J=dv.multiplyScalar(Math.min(b.mass,6)*.45),jl=J.length();if(jl>5)J.multiplyScalar(5/jl);
+   b.applyImpulse(new CV(J.x,J.y,J.z),new CV(E.x,E.y,E.z));wakeDoll(d)}
+  const off=lat.clone().negate();if(ax>S.lim)off.addScaledVector(Dw,-(ax-S.lim));return off}
+ const vD=vt.dot(D),lv=vt.clone().addScaledVector(D,-vD).length();if(window.__MSD&&window.__MSD.length<300)window.__MSD.push([+vD.toFixed(2),+lv.toFixed(2),+dt.toFixed(3),tip.toArray().map(v=>+v.toFixed(2))]);
+ if(TNOW-MST.t<.3||vD<1.3||lv>Math.max(.7,vD*.85))return null;
+ let hit=null;
+ for(const d of DOLLS){if(!d.skin)continue;if(d.sl&&d.sl.K&&d.sl.K.eng)continue;const pe=d.P.pelvis.b.position;if((pe.x-tip.x)**2+(pe.z-tip.z)**2>5)continue;
+  for(const C of macCaps(d)){if(!d.P[C.k]||d.P[C.k].b!==C.b)continue;for(const i of[N-1,N-2,N-3]){if(macIn(C,P[i])){hit={d,C,i};break}}if(hit)break}if(hit)break}
+ if(!hit)return null;const d=hit.d,C=hit.C;
+ // где остриё вошло в кожу: назад по клинку, пока не окажемся снаружи
+ const E=P[hit.i].clone();for(let q=0;q<14;q++){E.addScaledVector(D,-.004);if(!macIn(C,E))break}
+ const h0=KN.H.clone();KN.H.copy(En);let s=null;try{s=kStab(d,C.k,E,D,vD,true,.4,'Мачете')}catch(e){bugLog('macStabVR',e)}KN.H.copy(h0);
+ if(!s)return null;s.w.plug=true;MST.s=s;if(VR.R)vrPulse(VR.R,.7,40);return new V3()}
+// каждый кадр: укол без шлема по времени анимации; клинок в ране, а оружие сменили — вынимаем
+function macStabChk(rdt){const st=MCS.st;
+ if(st){if(!st.s&&!VR.on&&wi===WI_MAC&&MCS.t>=st.at)macStabHit2(st);
+  const S2=MCS.st;if(S2&&S2.s&&(MCS.t>=S2.out||MCS.t<0||wi!==WI_MAC||VR.on)){macStabOut(S2.s,S2.D.clone().multiplyScalar(-2.2),false);MCS.st=null}
+  else if(S2&&!S2.s&&(MCS.t<0||wi!==WI_MAC||VR.on))MCS.st=null}
+ if(MST.s&&(!VR.on||wi!==WI_MAC||!VR.R||MGRP.parent!==VR.R.grip)){macStabOut(MST.s,null,true);MST.s=null}}
+// кнопка режима мачете (над кнопкой оружия, как у аптечки)
+function macBtn(){const b=$('mact');if(!b)return;const on=wi===WI_MAC&&!VR.on&&!editing;b.style.display=on?'block':'none';if(!on)return;
+ b.textContent=tr(MCS.mode==='stab'?'Колоть':'Рубить');b.classList.toggle('stab',MCS.mode==='stab');hudAbove(b);
+ if(!MCS.hint){MCS.hint=true;setTimeout(()=>{if(wi===WI_MAC&&!VR.on)toast('Мачете: кнопка над оружием — рубить или колоть')},900)}}
+// кнопка над «оружием»; на низком экране (телефон лёжа) там панель кнопок — тогда слева от «оружия»
+function hudAbove(b){const w=$('wpn');if(!w)return;const r=w.getBoundingClientRect(),bw=Math.max(b.offsetWidth,r.width),h=b.offsetHeight||36;let x=Math.max(6,r.right-bw),y=Math.max(6,r.top-h-8);
+ const T=$('tools');if(T){const q=T.getBoundingClientRect();if(x<q.right+4&&x+bw>q.left-4&&y<q.bottom+4&&y+h>q.top-4){x=Math.max(6,r.left-bw-8);y=r.top+(r.height-h)/2}}
+ b.style.left=x+'px';b.style.top=y+'px'}
+function macMode(m){MCS.mode=m||(MCS.mode==='stab'?'chop':'stab');macBtn();toast(MCS.mode==='stab'?'Мачете: колоть':'Мачете: рубить')}
+{const b=$('mact');if(b)b.addEventListener('pointerdown',e=>{if(editing)return;ac();e.preventDefault();e.stopPropagation();macMode()})}
+addEventListener('resize',()=>{try{macBtn()}catch(e){}});
+
+/* ---- 2. отрубленное (голова, рука, кусок) — без шлема тоже берётся кнопкой «Схватить» ---- */
+function grabPiece(h){const ray=RC.ray,o=ray.origin,dir=ray.direction;let best=null;
+ for(const d of DOLLS){if(!d.skin)continue;for(const s of dollSph(d)){const b=s.b,P=d.P[s.k],loose=b.slLoose||(P&&P.b===b&&P.loose);if(!loose)continue;
+   const ox=s.x-o.x,oy=s.y-o.y,oz=s.z-o.z,t=ox*dir.x+oy*dir.y+oz*dir.z;if(t<.05||t>4)continue;
+   const dx=o.x+dir.x*t-s.x,dy=o.y+dir.y*t-s.y,dz=o.z+dir.z*t-s.z,d2=dx*dx+dy*dy+dz*dz,r=s.r*1.3;if(d2>r*r)continue;
+   const th=Math.max(.05,t-Math.sqrt(r*r-d2));if(!best||th<best.t)best={d,b,t:th,p:new V3(o.x+dir.x*th,o.y+dir.y*th,o.z+dir.z*th)}}}
+ if(!best||(h&&h.distance<best.t-.05&&!(h.object.userData.d===best.d&&best.d.P[h.object.userData.k]&&best.d.P[h.object.userData.k].b===best.b)))return false;
+ const RC0=new THREE.Raycaster(o.clone(),dir.clone(),0,best.t);const e=RC0.intersectObjects(ENV,false)[0];if(e)return false;
+ const b=best.b,P=best.p;hand.position.set(P.x,P.y,P.z);const con=new CANNON.PointToPointConstraint(b,b.pointToLocalFrame(new CV(P.x,P.y,P.z)),hand,new CV(0,0,0),900);world.addConstraint(con);
+ grab={d:best.d,con,dist:clamp(best.t,.9,2.4),soft:false,piece:b};b.wakeUp();sel=best.d;$('grab').classList.add('on');return true}
+function pieceRelease(b){if(!b||!b.velocity)return;const v=b.velocity,l=v.length();if(l>6)v.scale(6/l,v);const w=b.angularVelocity,wl=w.length();if(wl>10)w.scale(10/wl,w)}
+
+/* ---- 3. аптечка без шлема: попадание по настоящей коже, рана рядом с прицелом подхватывается сама ---- */
+// на телефоне точно в рану не прицелишься: пинцет и игла берут ближайшую подходящую рану в нескольких сантиметрах от прицела
+function medSnap(tool,o,dir,far,tHit,ed){let best=null,bs=1e9;const W=V65.a;
+ for(const d of DOLLS){if(!d.skin)continue;const pe=d.P.pelvis.b.position;if(pe.distanceTo(o)>far+1.4)continue;const L=[];
+  if(tool==='tw'){if(d.lodge)for(const q of d.lodge)if(!q.out&&q.w)L.push(q.w)}
+  else for(const w of d.wounds){if(w.own||w.healed)continue;if(tool==='sut'&&(w.sewn||w.seam))continue;L.push(w)}
+  for(const w of L){if(!woundW(d,w,W))continue;const t=(W.x-o.x)*dir.x+(W.y-o.y)*dir.y+(W.z-o.z)*dir.z;if(t<.05||t>far||t>ed-.02||t>tHit+.12)continue;
+   const px=o.x+dir.x*t-W.x,py=o.y+dir.y*t-W.y,pz=o.z+dir.z*t-W.z,pd=Math.sqrt(px*px+py*py+pz*pz),tol=.035+.03*t;if(pd>tol)continue;
+   // рана на той стороне тела, что от нас (спина, когда смотришь в грудь) — нет
+   const b=w.b||(d.P[w.part]&&d.P[w.part].b);if(b&&w.ln){b.vectorToWorldFrame(w.ln,V65.c);const nl=Math.hypot(V65.c.x,V65.c.y,V65.c.z);if(nl>1e-6&&(V65.c.x*dir.x+V65.c.y*dir.y+V65.c.z*dir.z)/nl>.35)continue}
+   const sc=pd/tol;if(sc<bs){bs=sc;best={d,k:w.part,p:W.clone(),snap:true}}}}
+ return best}
+function medPick(tool){if(VR.on)return medPick0();aimRay(MED.o,MED.dir);const far=2.6;RC.set(MED.o,MED.dir);RC.far=far;let h=null;
+ for(const h0 of RC.intersectObjects(DMESH,false)){const x=slRayFix(h0.object.userData.d,h0,RC.ray);if(x){h=x;break}}
+ const e=RC.intersectObjects(ENV,false)[0],ed=e?e.distance:1e9;let best=null;
+ if(h&&h.distance<ed){const d=h.object.userData.d;let k=h.object.userData.k;if(!k||!d.P[k]){let bd=1e9;for(const n in d.P){const b=d.P[n].b,q=(b.position.x-h.point.x)**2+(b.position.y-h.point.y)**2+(b.position.z-h.point.z)**2;if(q<bd){bd=q;k=n}}}best={d,k,p:h.point.clone(),t:h.distance}}
+ const sk=skinRay(MED.o,MED.dir,Math.min(far,best?best.t+.02:far));if(sk&&sk.s<ed&&(!best||sk.s<best.t-.004))best={d:sk.d,k:sk.C.k,p:sk.p,t:sk.s};
+ if(tool==='tw'||tool==='sut'||tool==='band'){const w=medSnap(tool,MED.o,MED.dir,far,best?best.t:1e9,ed);if(w)return w}
+ return best?{d:best.d,k:best.k,p:best.p}:null}
+
+/* ---- 4. срез: дыра в коже (если где-то не закрылось сечением) — изнутри тёмное мясо, а не «прозрачный» манекен ---- */
+function slFlesh(d){const m=d&&d.skin&&d.skin.mat;if(!m||m.userData.fl)return;m.userData.fl=1;
+ m.onBeforeCompile=sh=>{sh.fragmentShader=sh.fragmentShader.replace('void main() {','void main() {\n\tif(!gl_FrontFacing){gl_FragColor=vec4(.30,.035,.045,1.);return;}')};
+ m.customProgramCacheKey=()=>'wince-flesh';m.shadowSide=THREE.BackSide;m.side=XR.on?THREE.FrontSide:THREE.DoubleSide;m.needsUpdate=true}
+
+/* ---- 5. графика и звук ---- */
+function gfxSave(){try{localStorage.setItem(GK,JSON.stringify(GFX))}catch(e){}}
+const GFXC=window.matchMedia&&matchMedia('(pointer:coarse)').matches;
+function gfxRes(){if(VR.on)return;const dpr=window.devicePixelRatio||1;const pr=GFX.res?Math.max(.5,Math.min(dpr,2)*GFX.res):(lowQ?1:Math.min(dpr,1.5));if(Math.abs(rd.getPixelRatio()-pr)>1e-3)rd.setPixelRatio(pr)}
+function gfxShadow(){let on=true,sz;if(VR.on){const v=GFX.vsh;if(v===0)on=false;sz=v===1?512:1024}else{const v=GFX.sh<0?(GFXC?1:2):GFX.sh;if(v===0)on=false;sz=v===1?1024:2048}
+ if(sun.castShadow!==on)sun.castShadow=on;if(on&&sun.shadow.mapSize.x!==sz){if(sun.shadow.map){sun.shadow.map.dispose();sun.shadow.map=null}sun.shadow.mapSize.set(sz,sz)}}
+function gfxHz(){try{const s=VR.ses;if(!VR.on||!s||!GFX.hz||!s.updateTargetFrameRate||!s.supportedFrameRates)return;if([...s.supportedFrameRates].indexOf(GFX.hz)<0)return;const p=s.updateTargetFrameRate(GFX.hz);if(p&&p.catch)p.catch(()=>{})}catch(e){}}
+function gfxVol(){if(AC&&AC.__mg)AC.__mg.gain.value=GFX.vol}
+function gfxApply(){gfxRes();gfxShadow();gfxVol();const f=$('fps');if(f)f.style.display=GFX.show&&!VR.on?'block':'none';for(const d of DOLLS)if(d.sl)slFlesh(d)}
+const GFXF={n:0,t:performance.now(),lt:0,acc:0};
+// ограничение частоты кадров без шлема: копим время, рисуем, когда набрался интервал (на 90/120 Гц экранах тоже ровно 30 или 60 в среднем)
+function gfxSkip(now){if(!GFX.fps||VR.on){GFXF.lt=now;GFXF.acc=0;return false}const I=1000/GFX.fps,e=GFXF.lt?Math.max(0,now-GFXF.lt):I;GFXF.lt=now;GFXF.acc=Math.min(I*2,GFXF.acc+e);if(GFXF.acc<I-1.5)return true;GFXF.acc=Math.max(0,GFXF.acc-I);return false}
+function gfxTick(now){GFXF.n++;if(now-GFXF.t<500)return;const f=$('fps');if(f&&GFX.show&&!VR.on){f.style.display='block';f.textContent=Math.round(GFXF.n*1000/Math.max(1,now-GFXF.t))+' FPS'}else if(f)f.style.display='none';GFXF.n=0;GFXF.t=now}
+// пресеты качества: разрешение, тени, частота кадров (кровь и расчленение — отдельно, это не про скорость)
+const GFXQ=[{res:.5,sh:0,fps:30},{res:.75,sh:1,fps:60},{res:1,sh:2,fps:0}];
+function gfxSync(){const set=(id,v)=>{const el=$(id);if(!el)return;for(const b of el.querySelectorAll('.btn'))b.classList.toggle('on',+b.dataset.v===v)};
+ const sh=GFX.sh<0?(GFXC?1:2):GFX.sh;set('gRes',GFX.res);set('gFps',GFX.fps);set('gSh',sh);set('gBl',GFX.blood);set('gGore',GFX.gore?1:0);
+ const qi=GFXQ.findIndex(q=>q.res===GFX.res&&q.sh===sh&&q.fps===GFX.fps);set('gQ',qi);
+ const v=$('sVol');if(v)v.value=GFX.vol;const c=$('cFps');if(c)c.checked=!!GFX.show}
+{const bind=(id,fn)=>{const el=$(id);if(!el)return;el.addEventListener('click',e=>{const b=e.target.closest('.btn');if(!b||!el.contains(b))return;fn(+b.dataset.v);gfxSave();gfxApply();gfxSync()})};
+ bind('gRes',v=>{GFX.res=v});bind('gFps',v=>{GFX.fps=v});bind('gSh',v=>{GFX.sh=v});bind('gBl',v=>{GFX.blood=v});bind('gGore',v=>{GFX.gore=!!v});
+ bind('gQ',v=>{const q=GFXQ[v];if(q){GFX.res=q.res;GFX.sh=q.sh;GFX.fps=q.fps}});
+ const vol=$('sVol');if(vol)vol.oninput=e=>{GFX.vol=+e.target.value;gfxVol();gfxSave()};const cf=$('cFps');if(cf)cf.onchange=e=>{GFX.show=e.target.checked;gfxSave();gfxApply()};
+ // вкладки окна настроек
+ const box=document.querySelector('#cfg .box');if(box)box.addEventListener('click',e=>{const t=e.target.closest('.tab');if(!t)return;for(const x of box.querySelectorAll('.tab'))x.classList.toggle('on',x===t);for(const p of box.querySelectorAll('.tp'))p.hidden=p.dataset.tab!==t.dataset.tab})}
+addEventListener('resize',()=>{try{gfxRes()}catch(e){}});
+// в шлеме: страница «Графика» на запястье
+function gfxVrBtns(B,add){let y=170;const row=(lab,opts)=>{B.push({lab,y});const n=opts.length,w=(VPW-36-(n-1)*10)/n;opts.forEach((o,i)=>add(o[0],18+i*(w+10),y+10,w,44,o[1],o[2]));y+=66};
+ const S=(f)=>()=>{f();gfxSave();gfxApply()};
+ row('Тени',[['Выкл.',S(()=>{GFX.vsh=0}),()=>GFX.vsh===0],['Низкие',S(()=>{GFX.vsh=1}),()=>GFX.vsh===1],['Высокие',S(()=>{GFX.vsh=2}),()=>GFX.vsh===2]]);
+ row('Разрешение',[['Низкое',S(()=>{GFX.vres=.75;toast('Разрешение сменится, когда снова войдёшь в VR')}),()=>GFX.vres<.85],['Обычное',S(()=>{GFX.vres=.9;toast('Разрешение сменится, когда снова войдёшь в VR')}),()=>GFX.vres>=.85&&GFX.vres<1],['Высокое',S(()=>{GFX.vres=1.1;toast('Разрешение сменится, когда снова войдёшь в VR')}),()=>GFX.vres>=1]]);
+ let hz=[];try{if(VR.ses&&VR.ses.supportedFrameRates&&VR.ses.updateTargetFrameRate)hz=[...VR.ses.supportedFrameRates].filter(r=>r>=60).slice(0,4)}catch(e){}
+ if(hz.length>1)row('Частота кадров',hz.map(r=>[r+' Гц',S(()=>{GFX.hz=r;gfxHz()}),()=>Math.round((VR.ses&&VR.ses.frameRate)||GFX.hz)===r]));
+ row('Кровь',[['Выкл.',S(()=>{GFX.blood=0}),()=>GFX.blood===0],['Мало',S(()=>{GFX.blood=.35}),()=>GFX.blood>0&&GFX.blood<1],['Обычно',S(()=>{GFX.blood=1}),()=>GFX.blood===1],['Много',S(()=>{GFX.blood=1.6}),()=>GFX.blood>1]]);
+ row('Расчленение от выстрелов',[['Вкл.',S(()=>{GFX.gore=true}),()=>GFX.gore],['Выкл.',S(()=>{GFX.gore=false}),()=>!GFX.gore]]);
+ row('Громкость',[['0%',S(()=>{GFX.vol=0}),()=>GFX.vol<.15],['35%',S(()=>{GFX.vol=.35}),()=>GFX.vol>=.15&&GFX.vol<.5],['65%',S(()=>{GFX.vol=.65}),()=>GFX.vol>=.5&&GFX.vol<.85],['100%',S(()=>{GFX.vol=1}),()=>GFX.vol>=.85]]);
+ add('Назад',18,y+8,VPW-36,50,()=>{VR.page='cfg'});return B}
+
+/* ---- 6. геймпад (Xbox, PlayStation, Bluetooth) без шлема ---- */
+// левый стик — ходьба (нажать — бег), правый — обзор, RT — огонь/удар/применить, LT — схватить, RB/LB и крестовина влево-вправо — оружие,
+// A — средство аптечки или режим мачете, X — рентген, Y — + манекен, B — закрыть окно, Start — настройки, Back — статистика, правый стик нажать — замедление
+const GP={on:false,i:-1,pb:[],mx:0,mz:0,run:false,tx:0,ty:0,twDown:false,seen:false};
+function gpDz(v,dz){const a=Math.abs(v);return a<dz?0:Math.sign(v)*(a-dz)/(1-dz)}
+function gpBtn(p,i){const b=p.buttons[i];return!!b&&(b.pressed||b.value>.5)}
+function gpTwEv(x,y){const c=$('twc'),r=c.getBoundingClientRect();return{clientX:r.left+(x/1.25+1)/2*r.width,clientY:r.top+34+(y/1.25+1)/2*r.height,preventDefault(){}}}
+function gpPoll(rdt){if(VR.on||!navigator.getGamepads){GP.mx=GP.mz=0;GP.run=false;return}let pads;try{pads=navigator.getGamepads()}catch(e){return}if(!pads)return;
+ let p=null;for(const q of pads)if(q&&q.connected&&q.buttons&&q.buttons.length>=10&&q.axes&&q.axes.length>=4){p=q;break}
+ if(!p){if(GP.on){GP.on=false;GP.mx=GP.mz=0;GP.run=false;document.body.classList.remove('gp');if(GP.lt){GP.lt=false;grabEnd()}if(GP.rt){GP.rt=false;trig=false;trigNew=false}toast('Геймпад отключён')}return}
+ const B=[];for(let i=0;i<17;i++)B.push(gpBtn(p,i));const pr=GP.pb,dn=i=>B[i]&&!pr[i];
+ const ax=[gpDz(p.axes[0],.18),gpDz(p.axes[1],.18),gpDz(p.axes[2],.14),gpDz(p.axes[3],.14)],act=ax.some(v=>v!==0)||B.some(v=>v);
+ if(act&&!GP.on){GP.on=true;ac();document.body.classList.add('gp');if(!GP.seen){GP.seen=true;toast('Геймпад подключён')}}
+ if(!GP.on){GP.pb=B;return}
+ const cfgOpen=$('cfg').style.display==='flex',stOpen=$('statp').style.display==='flex';
+ if(dn(9)){if(cfgOpen)closeCfg();else if(!stOpen&&!editing)openCfg()}
+ if(dn(1)){if(TWG.on)twClose();else if(cfgOpen)closeCfg();else if(stOpen)closeSt();else try{medPal(false)}catch(e){}}
+ if(dn(8)&&!cfgOpen){if(stOpen)closeSt();else openSt()}
+ if(cfgOpen||stOpen||editing){GP.mx=GP.mz=0;GP.pb=B;return}
+ // мини-игра пинцета: левый стик водит пинцетом, RT (или A) — опустить в рану
+ if(TWG.on){const f=rdt*.9;GP.tx=clamp(GP.tx+ax[0]*f+ax[2]*f*.5,-1.2,1.2);GP.ty=clamp(GP.ty+ax[1]*f+ax[3]*f*.5,-1.2,1.2);const hold=B[7]||B[0];
+  if(hold&&!GP.twDown){GP.twDown=true;twMove(gpTwEv(GP.tx,GP.ty),true)}else if(hold)twMove(gpTwEv(GP.tx,GP.ty));else if(GP.twDown){GP.twDown=false;twUp()}else if(ax[0]||ax[1]||ax[2]||ax[3])twMove(gpTwEv(GP.tx,GP.ty))
+  GP.mx=GP.mz=0;GP.pb=B;return}
+ GP.twDown=false;GP.tx=GP.ty=0;
+ GP.mx=ax[0];GP.mz=-ax[1];GP.run=B[10]||(CFG.run&&Math.hypot(ax[0],ax[1])>.95);
+ const s=CFG.sens*rdt,lx=ax[2]*Math.abs(ax[2])*.6+ax[2]*.4,ly=ax[3]*Math.abs(ax[3])*.6+ax[3]*.4;PL.yaw-=lx*2.9*s;PL.pitch=clamp(PL.pitch-ly*2.1*s,-1.45,1.45);
+ if(B[7]&&!GP.rt){GP.rt=true;trig=true;trigNew=true}else if(!B[7]&&GP.rt){GP.rt=false;trig=false;trigNew=false}
+ if(B[6]&&!GP.lt){GP.lt=true;grabStart()}else if(!B[6]&&GP.lt){GP.lt=false;grabEnd()}
+ if(dn(5)||dn(15)){setW(wi+1);toast(WPN[wi].n)}if(dn(4)||dn(14)){setW(wi-1);toast(WPN[wi].n)}
+ if(dn(0)){if(WPN[wi].med)medSel(MED.t+1);else if(wi===WI_MAC)macMode()}
+ if(WPN[wi].med){if(dn(12))medSel(MED.t-1);if(dn(13))medSel(MED.t+1)}
+ if(dn(2))setXr(!XR.on);if(dn(3)){spawnDoll();toast('+ Манекен')}
+ if(dn(11)){TSC=TSC<1?1:.25;$('bSlow').classList.toggle('on',TSC<1)}
+ GP.pb=B}
+// коснулся экрана — снова показываем сенсорные кнопки
+addEventListener('pointerdown',e=>{if(e.pointerType!=='mouse'&&document.body.classList.contains('gp'))document.body.classList.remove('gp')},true);
+
+try{gfxApply()}catch(e){bugLog('gfx',e)}
+Object.assign(window.__G,{skinRay,macAnim2D,macStab2D,macStabHit2,macStabOut,macStabVR,macStabChk,macBtn,macMode,MCS,MST,grabPiece,pieceRelease,medSnap,medPick,medPick0,slFlesh,GFX,gfxApply,gfxSync,gfxVrBtns,GFXQ,GP,gpPoll,getGrab:()=>grab,MGRP,KN,setTrig:v=>{trig=v;trigNew=v},wi:()=>wi,XR,isHeld,TWG});
+
 applyLang();
 rd.setAnimationLoop(loop);
 })();
