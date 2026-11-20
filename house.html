@@ -85,6 +85,7 @@ body.pc #joy,body.pc #acts{display:none}
  <div class="crow"><label for="cBody" data-t="Показывать своё тело">Показывать своё тело</label><input type="checkbox" id="cBody"></div>
  <div class="crow"><label for="cBlim" data-t="Кровь без лимита (может тормозить)">Кровь без лимита (может тормозить)</label><input type="checkbox" id="cBlim"></div>
  <div class="crow"><label for="cIdie" data-t="Потерял сознание — сразу смерть">Потерял сознание — сразу смерть</label><input type="checkbox" id="cIdie"></div>
+ <div class="crow"><label for="cInf" data-t="Бесконечные патроны">Бесконечные патроны</label><input type="checkbox" id="cInf"></div>
  <div class="lrow"><label data-t="Люди">Люди</label><div class="seg"><button class="btn" id="bNpc" data-t="Добавить человека">Добавить человека</button><button class="btn" id="bNpcX" data-t="Убрать всех">Убрать всех</button></div></div>
  <div class="lrow"><label data-t="Тени">Тени</label><div class="seg" id="gSh"><button class="btn" data-v="0" data-t="Выкл.">Выкл.</button><button class="btn" data-v="1" data-t="Низкие">Низкие</button><button class="btn" data-v="2" data-t="Высокие">Высокие</button></div></div>
  <div class="lrow"><label data-t="Разрешение">Разрешение</label><div class="seg" id="gRes"><button class="btn" data-v="0" data-t="Авто">Авто</button><button class="btn" data-v="0.5">50%</button><button class="btn" data-v="0.75">75%</button><button class="btn" data-v="1">100%</button></div></div>
@@ -373,7 +374,7 @@ Object.assign(DICT,{
  'Двумя руками':['Oburącz','Two hands'],'Одной рукой':['Jedną ręką','One hand'],'Зарядить магазин':['Załaduj magazynek','Load magazine'],'Открыть коробку':['Otwórz pudełko','Open the box'],'Закрыть коробку':['Zamknij pudełko','Close the box'],
  'Взять патрон':['Weź nabój','Take a cartridge'],'Сколько патронов':['Ile naboi','Rounds left'],'В магазине':['W magazynku','In the magazine'],'Выстрел в голову':['Strzał w głowę','Shot to the head'],'огнестрельное ранение головы':['rana postrzałowa głowy','gunshot wound to the head'],
  'Выстрел себе':['Strzał w siebie','Shot yourself'],'Людей уже много (6)':['Za dużo ludzi (6)','Too many people (6)'],'Нет места':['Brak miejsca','No room'],'Люди':['Ludzie','People'],'Добавить человека':['Dodaj człowieka','Add a person'],'Убрать всех':['Usuń wszystkich','Remove all'],
- 'Людей больше нет':['Nie ma już ludzi','No more people'],'Потерял сознание — сразу смерть':['Utrata przytomności — od razu śmierć','Pass out — die at once'],'Без сознания':['Nieprzytomny','Passing out'],'сразу смерть':['od razu śmierć','die at once'],'лежишь':['leżysz','lie there'],
+ 'Людей больше нет':['Nie ma już ludzi','No more people'],'Потерял сознание — сразу смерть':['Utrata przytomności — od razu śmierć','Pass out — die at once'],'Без сознания':['Nieprzytomny','Passing out'],'Бесконечные патроны':['Nieskończona amunicja','Infinite ammo'],'Патроны':['Amunicja','Ammo'],'бесконечные':['nieskończona','infinite'],'обычные':['zwykła','normal'],'сразу смерть':['od razu śmierć','die at once'],'лежишь':['leżysz','lie there'],
  'Рюкзак':['Plecak','Backpack'],'л':['l','L']});
 
 /* ================= переводы: манекены Wince, магазин рукой, переворот ================= */
@@ -2991,7 +2992,7 @@ function cloOpen(){try{document.exitPointerLock()}catch(e){}const L=$('cloList')
   if(it){const b=document.createElement('button');b.className='btn';b.textContent=tr('Снять');b.onclick=()=>{ac();undress(s);cloOpen()};row.appendChild(b)}L.appendChild(row)}
  const n=document.createElement('p');n.className='note';n.textContent=tr('Надеть: возьми вещь из шкафа и нажми «Надеть».');L.appendChild(n);$('clothes').style.display='flex'}
 function segSet(id,v){for(const b of $(id).querySelectorAll('[data-v]'))b.classList.toggle('on',+b.dataset.v===+v)}
-function cfgOpen(){try{document.exitPointerLock()}catch(e){}$('sSens').value=CFG.sens;$('sSize').value=CFG.size;$('cBody').checked=CFG.body;$('cBlim').checked=CFG.blim===false;$('cIdie').checked=!!CFG.idie;segSet('gSh',shLevel());segSet('gRes',CFG.res);$('cfg').style.display='flex';applyLang()}
+function cfgOpen(){try{document.exitPointerLock()}catch(e){}$('sSens').value=CFG.sens;$('sSize').value=CFG.size;$('cBody').checked=CFG.body;$('cBlim').checked=CFG.blim===false;$('cIdie').checked=!!CFG.idie;$('cInf').checked=!!CFG.inf;segSet('gSh',shLevel());segSet('gRes',CFG.res);$('cfg').style.display='flex';applyLang()}
 function shLevel(){return CFG.sh<0?(isPC()&&!VR.on?2:1):CFG.sh}
 // графика: тени (выкл / низкие / высокие) и разрешение
 function gfxApply(){const sh=shLevel(),on=sh>0,hi=sh===2;
@@ -3032,7 +3033,7 @@ function plInit(){const cv=rd.domElement;
  $('bCfg').onclick=()=>{ac();cfgOpen()};$('bCfgClose').onclick=()=>{$('cfg').style.display='none'};
  for(const b of document.querySelectorAll('[data-lang]'))b.onclick=()=>{setLang(b.dataset.lang);cfgSave()};
  $('sSens').oninput=e=>{CFG.sens=+e.target.value;cfgSave()};$('sSize').oninput=e=>{CFG.size=+e.target.value;document.documentElement.style.setProperty('--bs',CFG.size);cfgSave()};
- $('cBody').onchange=e=>{CFG.body=e.target.checked;cfgSave()};$('cBlim').onchange=e=>{CFG.blim=!e.target.checked;cfgSave()};$('cIdie').onchange=e=>{CFG.idie=e.target.checked;cfgSave()};$('bNpc').onclick=()=>{ac();$('cfg').style.display='none';npcAdd()};$('bNpcX').onclick=()=>{npcClear();toast('Людей больше нет')};$('bRestart').onclick=()=>{ac();meReset()};
+ $('cBody').onchange=e=>{CFG.body=e.target.checked;cfgSave()};$('cBlim').onchange=e=>{CFG.blim=!e.target.checked;cfgSave()};$('cIdie').onchange=e=>{CFG.idie=e.target.checked;cfgSave()};$('cInf').onchange=e=>{CFG.inf=e.target.checked;cfgSave()};$('bNpc').onclick=()=>{ac();$('cfg').style.display='none';npcAdd()};$('bNpcX').onclick=()=>{npcClear();toast('Людей больше нет')};$('bRestart').onclick=()=>{ac();meReset()};
  for(const b of $('gSh').querySelectorAll('[data-v]'))b.onclick=()=>{CFG.sh=+b.dataset.v;cfgSave();gfxApply();segSet('gSh',CFG.sh)};
  for(const b of $('gRes').querySelectorAll('[data-v]'))b.onclick=()=>{CFG.res=+b.dataset.v;cfgSave();gfxApply();segSet('gRes',CFG.res)};
  // подсказка
@@ -3437,17 +3438,18 @@ function vrTip(t,p,sec){const W=512,Hh=128;if(!VR.tip){VR.tipC=mkCanvas(W,Hh);VR
  const g=VR.tipC.getContext('2d');g.clearRect(0,0,W,Hh);g.fillStyle='rgba(16,18,22,.88)';rr(g,0,0,W,Hh,24);g.fill();g.fillStyle='#fff';g.font='600 30px system-ui,sans-serif';g.textAlign='center';g.textBaseline='middle';
  const words=String(t).split(' '),lines=[''];for(const w of words){const l=lines[lines.length-1],c=l?l+' '+w:w;if(g.measureText(c).width>W-40&&l)lines.push(w);else lines[lines.length-1]=c}
  const ls=lines.slice(0,3),y0=Hh/2-(ls.length-1)*17;ls.forEach((l,i)=>g.fillText(l,W/2,y0+i*34));VR.tipT.needsUpdate=true;VR.tip.position.copy(p);VR.tip.visible=true;VR.tipLeft=sec||1.5}
-const VPH=76+8*80+12;
+const VPH=76+9*80+12;
 function vrPanelBuild(){const c=VR.pc=mkCanvas(512,VPH);VR.pt=new THREE.CanvasTexture(c);const m=VR.panel=new THREE.Mesh(new THREE.PlaneGeometry(.17,.17*VPH/512),new THREE.MeshBasicMaterial({map:VR.pt,transparent:true,depthWrite:false}));m.visible=false;m.renderOrder=6;
  const dot=VR.dot=new THREE.Mesh(new THREE.SphereGeometry(.004,8,6),new THREE.MeshBasicMaterial({color:0xff8a50,depthTest:false}));dot.renderOrder=7;dot.visible=false;scene.add(dot);
  VR.beam=new THREE.Line(new THREE.BufferGeometry().setFromPoints([new V3(0,0,0),new V3(0,0,-1)]),new THREE.LineBasicMaterial({color:0xffc2a6,transparent:true,opacity:.7}));VR.beam.visible=false;vrPanelDraw()}
 function vrPanelAttach(H){const P=VR.panel;if(P&&P.parent!==H.g){H.g.add(P);P.position.set(0,.035,.115);P.rotation.set(-1.05,0,0)}}
-function vrRows(){const cm=Math.round((CFG.hgt||0)*100);return[tr('Поворот')+': '+(CFG.smooth?tr('плавный'):CFG.turn+'°'),tr('Тело')+': '+tr(CFG.body?'видно':'скрыто'),tr('Рост')+': '+(Math.abs(cm)<3?tr('обычный'):(cm>0?'+':'−')+Math.abs(cm)+tr(' см')),tr('Кровь')+': '+tr(CFG.blim===false?'без лимита':'с лимитом'),tr('Без сознания')+': '+tr(CFG.idie?'сразу смерть':'лежишь'),tr('Добавить человека')+(NPCS.length?' ('+NPCS.length+')':''),tr('Язык')+': '+({ru:'Русский',pl:'Polski',en:'English'})[LANG],tr('Выйти из VR')]}
+function vrRows(){const cm=Math.round((CFG.hgt||0)*100);return[tr('Поворот')+': '+(CFG.smooth?tr('плавный'):CFG.turn+'°'),tr('Тело')+': '+tr(CFG.body?'видно':'скрыто'),tr('Рост')+': '+(Math.abs(cm)<3?tr('обычный'):(cm>0?'+':'−')+Math.abs(cm)+tr(' см')),tr('Кровь')+': '+tr(CFG.blim===false?'без лимита':'с лимитом'),tr('Без сознания')+': '+tr(CFG.idie?'сразу смерть':'лежишь'),tr('Добавить человека')+(NPCS.length?' ('+NPCS.length+')':''),tr('Язык')+': '+({ru:'Русский',pl:'Polski',en:'English'})[LANG],tr('Патроны')+': '+tr(CFG.inf?'бесконечные':'обычные'),tr('Выйти из VR')]}
 function vrPanelDraw(){const c=VR.pc;if(!c)return;const g=c.getContext('2d'),W=512,Hh=VPH;g.clearRect(0,0,W,Hh);g.fillStyle='rgba(16,18,22,.9)';rr(g,0,0,W,Hh,26);g.fill();
  g.fillStyle='#eef1f4';g.font='600 28px system-ui,sans-serif';g.textAlign='left';g.textBaseline='middle';const msg=VR.msgT>0&&VR.msg?VR.msg:tr('Меню');g.fillText(msg.length>30?msg.slice(0,29)+'…':msg,24,40);
  vrRows().forEach((r,i)=>{const y=76+i*80;g.fillStyle=i===VR.hover?'rgba(226,98,45,.92)':'rgba(255,255,255,.1)';rr(g,16,y,W-32,68,14);g.fill();g.fillStyle='#fff';g.font='600 30px system-ui,sans-serif';g.fillText(r,36,y+35)});VR.pt.needsUpdate=true}
 function vrPanelPress(i){if(i===0){if(CFG.smooth){CFG.smooth=false;CFG.turn=45}else if(CFG.turn===45)CFG.turn=30;else CFG.smooth=true}else if(i===1)CFG.body=!CFG.body;else if(i===2)CFG.hgt=0;else if(i===3)CFG.blim=CFG.blim===false;else if(i===4)CFG.idie=!CFG.idie;else if(i===5)npcAdd();else if(i===6)setLang(LANG==='ru'?'pl':LANG==='pl'?'en':'ru');
- else if(i===7){try{VR.ses&&VR.ses.end()}catch(e){}}cfgSave();vrPanelDraw()}
+ else if(i===7)CFG.inf=!CFG.inf;
+ else if(i===8){try{VR.ses&&VR.ses.end()}catch(e){}}cfgSave();vrPanelDraw()}
 // рюкзак в руке (или рука у рюкзака за спиной): сколько места занято
 function vrBagLabel(){if(!BAGI)return;let show=false,p=null;const h=VR.C.find(H=>H.src&&H.held===BAGI);
  if(h){BAGI.g.updateMatrixWorld();p=VV[6].set(0,BAGI.g.userData.dims[1]/2+.07,0).applyMatrix4(BAGI.g.matrixWorld);show=true}
@@ -3462,7 +3464,7 @@ function vrUiStep(dt){const P=VR.panel,L=vrHand('left'),R=vrHand('right');try{vr
  let vis=false;if(L&&P.parent===L.g){P.updateMatrixWorld();const pp=VV[1].setFromMatrixPosition(P.matrixWorld),n=VV[2].set(0,0,1).transformDirection(P.matrixWorld);vis=n.dot(VV[3].subVectors(AV.E,pp).normalize())>.45}
  P.visible=vis;let hov=-1;
  if(vis&&R&&!R.held&&!R.grab){if(VR.beam.parent!==R.c)R.c.add(VR.beam);R.c.updateMatrixWorld();const o=VV[1].setFromMatrixPosition(R.c.matrixWorld),d=VV[2].set(0,0,-1).transformDirection(R.c.matrixWorld);VRAY.set(o,d);VRAY.far=1.2;const h=VRAY.intersectObject(P,false)[0];
-  if(h&&h.uv){const y=(1-h.uv.y)*VPH,x=h.uv.x*512,i=Math.floor((y-76)/80);if(i>=0&&i<8&&x>16&&x<496&&(y-76)%80<68)hov=i;VR.dot.position.copy(h.point);VR.dot.visible=true;VR.beam.scale.set(1,1,h.distance);VR.beam.visible=true}else{VR.dot.visible=false;VR.beam.visible=false}}
+  if(h&&h.uv){const y=(1-h.uv.y)*VPH,x=h.uv.x*512,i=Math.floor((y-76)/80);if(i>=0&&i<9&&x>16&&x<496&&(y-76)%80<68)hov=i;VR.dot.position.copy(h.point);VR.dot.visible=true;VR.beam.scale.set(1,1,h.distance);VR.beam.visible=true}else{VR.dot.visible=false;VR.beam.visible=false}}
  else{VR.dot.visible=false;VR.beam.visible=false}
  if(hov!==VR.hover){VR.hover=hov;vrPanelDraw();if(hov>=0)haptic(R,.1,8)}}
 
@@ -3566,10 +3568,10 @@ function gunLook(it){const G=it.gun,U=it.gu;if(!U)return;U.sl.position.z=G.sl;U.
 function slideTo(it,v){const G=it.gun,p0=G.sl;G.sl=clamp(v,0,SLMAX);
  if(G.sl>=SLMAX-.002&&p0<SLMAX-.002){// дошёл назад: что было в патроннике — вылетает, ударник взведён
   if(G.ch)ejectRound(it,G.ch===1);G.ch=0;G.cock=true;gsfx('slback',it.g.position,.6);
-  if(G.mag&&G.mag.mag.n===0)G.lockArm=true}
+  if(G.mag&&G.mag.mag.n===0&&!CFG.inf)G.lockArm=true}
  if(G.sl<SLMAX-.004)G.lockArm=false;
  if(G.sl<=.0015&&p0>.0015){// вернулся вперёд: дослал патрон из магазина
-  if(G.lr&&G.mag&&G.mag.mag.n>0&&!G.ch){G.mag.mag.n--;magLook(G.mag);G.ch=1}gsfx('slfwd',it.g.position,.8);G.lr=false}
+  if(G.lr&&G.mag&&(G.mag.mag.n>0||CFG.inf)&&!G.ch){if(!CFG.inf)G.mag.mag.n--;magLook(G.mag);G.ch=1}gsfx('slfwd',it.g.position,.8);G.lr=false}
  if(G.sl>SLMAX-.004)G.lr=true;gunLook(it)}
 // отпустил затвор: пружина возвращает (или задержка держит)
 function slideRelease(it){const G=it.gun;if(G.lockArm&&G.sl>SLMAX-.004){G.lock=true;G.sl=SLMAX;gsfx('load',it.g.position,.6);gunLook(it);return}G.slv=-3.2}
@@ -3577,7 +3579,7 @@ function gunSlideStop(it){const G=it.gun;if(!G.lock)return;G.lock=false;G.lockAr
 function gunStep(it,dt){const G=it.gun;if(!G)return;
  if(G.slv&&!G.slH&&!G.rs){const n=G.sl+G.slv*dt;slideTo(it,n);if(G.sl<=0){G.slv=0}}
  // автоматика после выстрела: затвор отходит назад и возвращается
- if(G.cyc>0){G.cyc-=dt;if(!G.cyc2){slideTo(it,SLMAX);G.cyc2=true;if(G.mag&&G.mag.mag.n===0)G.lockArm=true}if(G.cyc<=.03&&G.cyc2){G.cyc=0;G.cyc2=false;if(G.lockArm){G.lock=true;G.sl=SLMAX;gunLook(it)}else G.slv=-6}}
+ if(G.cyc>0){G.cyc-=dt;if(!G.cyc2){slideTo(it,SLMAX);G.cyc2=true;if(G.mag&&G.mag.mag.n===0&&!CFG.inf)G.lockArm=true}if(G.cyc<=.03&&G.cyc2){G.cyc=0;G.cyc2=false;if(G.lockArm){G.lock=true;G.sl=SLMAX;gunLook(it)}else G.slv=-6}}
  if(G.lock&&!G.slH)G.sl=SLMAX;G.kick=Math.max(0,G.kick-dt*9);gunLook(it)}
 // ---- спуск ----
 function gunTrig(it,v,o,d){const G=it.gun;G.trig=v;if(v<.45)G.ready=true;if(v>.9&&G.ready){G.ready=false;
