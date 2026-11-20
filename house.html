@@ -196,14 +196,18 @@ if(uXC.x+uXC.y+uXC.z>0.001){vec3 xl=uXL-vZW;float xd=length(xl);vec3 xL=xl/max(x
 #endif
 #include <lights_fragment_end>`;
 // материал с освещением комнаты: свет лампы этой комнаты (без утечек сквозь стены), окружающий свет — по комнате и проёмам
-function zMat(p,Z){const m=new THREE.MeshStandardMaterial(Object.assign({roughness:.85,metalness:0},p));m.userData.Z=Z||ZOUT;
- m.onBeforeCompile=sh=>{const Z=m.userData.Z;for(const k in Z.U)sh.uniforms[k]=Z.U[k];Object.assign(sh.uniforms,XLU);m.userData.sh=sh;
+// ссылки на зону и шейдер в userData — неперечисляемые: three.js копирует userData через JSON (clone/copy), а зона с выключателями —
+// кольцевая ссылка, JSON падал (например, нос манекена при падении лицом). clone — снова зональный материал.
+function zHide(o,k,v){Object.defineProperty(o,k,{value:v,writable:true,enumerable:false,configurable:true})}
+function zMat(p,Z){const m=new THREE.MeshStandardMaterial(Object.assign({roughness:.85,metalness:0},p));zHide(m.userData,'Z',Z||ZOUT);
+ m.clone=function(){const n=zMat({},this.userData.Z);n.copy(this);zHide(n.userData,'Z',this.userData.Z);if(this.userData.post)n.userData.post=this.userData.post;return n};
+ m.onBeforeCompile=sh=>{const Z=m.userData.Z;for(const k in Z.U)sh.uniforms[k]=Z.U[k];Object.assign(sh.uniforms,XLU);zHide(m.userData,'sh',sh);
   sh.vertexShader=sh.vertexShader.replace('#include <common>','#include <common>\nvarying vec3 vZW;varying vec3 vZN;')
    .replace('#include <project_vertex>','#include <project_vertex>\n\t{vec4 zw=vec4(transformed,1.0);vec3 zn=objectNormal;\n#ifdef USE_INSTANCING\nzw=instanceMatrix*zw;zn=mat3(instanceMatrix)*zn;\n#endif\nvZW=(modelMatrix*zw).xyz;vZN=normalize(mat3(modelMatrix)*zn);}');
   sh.fragmentShader=sh.fragmentShader.replace('#include <common>',ZFH).replace('#include <lights_fragment_begin>',LFB).replace('#include <lights_fragment_end>',ZFE);
   if(m.userData.post)m.userData.post(sh)};
  m.customProgramCacheKey=()=>'zone'+(m.userData.ck||'');return m}
-function setZone(m,Z){if(!m||!m.userData||m.userData.Z===Z||!Z||!Z.U)return;m.userData.Z=Z;const sh=m.userData.sh;if(sh)for(const k in Z.U)sh.uniforms[k]=Z.U[k]}
+function setZone(m,Z){if(!m||!m.userData||m.userData.Z===Z||!Z||!Z.U)return;zHide(m.userData,'Z',Z);const sh=m.userData.sh;if(sh)for(const k in Z.U)sh.uniforms[k]=Z.U[k]}
 function setZoneObj(o,Z){o.traverse(c=>{if(c.material){if(Array.isArray(c.material))c.material.forEach(m=>setZone(m,Z));else setZone(c.material,Z)}})}
 const FL={on:false,item:null,pos:new V3(),dir:new V3(0,0,-1),light:null,z1:null};// фонарик
 // уровень света в точке (для «в темноте не видно»): 0 — тьма, 1 — светло; у проёмов — плавно, как в шейдере
@@ -4123,14 +4127,15 @@ function updFlows(dt){if(dt<=0)return;
   const R=REG[f.R],bn=boneAt(R,f.t),body=d.P[bn].b;BQ.set(body.quaternion.x,body.quaternion.y,body.quaternion.z,body.quaternion.w).invert();BDL.set(0,-1,0).applyQuaternion(BQ);
   const ab=R.f(f.t),rad=Math.max(.012,(ab[0]+ab[1])/2),cs=Math.cos(f.th),sn=Math.sin(f.th),ar=BDL.x*cs-BDL.z*sn,al=BDL.y,tang=Math.hypot(ar,al),out=BDL.x*sn+BDL.z*cs;
   if(tang<.22&&out>0){if(I>.00012){f.dripT-=dt;if(f.dripT<=0){f.dripT=clamp(.0016/(I+2e-5),.12,1.6);flowDrop(f,body,bn,R,ab,cs,sn,I)}}continue}
-  if(tang<.05){f.wait=(f.wait||0)+dt;if(f.wait>6){flowEnd(f);FLOWS.splice(i,1)}continue}
-  const v=(.04+f.w0*3)*clamp(I/.0012,.3,1.6)*Math.pow(Math.max(0,1-f.L/f.Lmax),.55)*clamp(tang*1.4,.3,1)*(d.cl&&wdClAt(d,R,f.t)?.3:1);
+  if(tang<.14){f.wait=(f.wait||0)+dt;if(f.wait>6){flowEnd(f);FLOWS.splice(i,1)}continue}
+  const v=(.04+f.w0*3)*clamp(I/.0012,.3,1.6)*Math.pow(Math.max(0,1-f.L/f.Lmax),.55)*clamp((tang-.12)*1.5,0,1)*(d.cl&&wdClAt(d,R,f.t)?.3:1);
   if(v<.003){if(f.L>=f.Lmax*.97){flowEnd(f);FLOWS.splice(i,1)}continue}
   const ux=ar/tang,uy=al/tang,sp=v*dt,th1=f.th+ux*sp/rad+Math.sin(f.t*40+f.sd)*sp*.05/rad,t1=f.t+uy*sp,lo=Math.min(R.t0,R.t1),hi=Math.max(R.t0,R.t1);
   if(f.R==='head'&&t1<1.468){f.R='torso';f.t=t1;f.th=th1;continue}
   if(f.R==='torso'&&t1<.93){const x=R.cx+ab[0]*Math.sin(th1),z=R.cz+ab[1]*Math.cos(th1);if(Math.abs(x)>.035){const k=x>0?'legR':'legL',LR=REG[k];f.R=k;f.th=Math.atan2(x-LR.cx,z-LR.cz);f.t=t1;continue}}
   if(t1<lo){flowDrop(f,body,bn,R,ab,cs,sn,I);flowEnd(f);FLOWS.splice(i,1);continue}
   if(t1>hi){flowEnd(f);FLOWS.splice(i,1);continue}
+  if(d.cl&&!f.wcl&&wdClAt(d,R,t1)&&!wdClAt(d,R,f.t)){f.wcl=1;wdClEnter(d,f.w,f.R,th1,t1)}
   const r=R.rect,c0=coAt(R,f.th,f.t),c1=coAt(R,th1,t1),wv=f.w0*(1-.5*Math.min(1,f.L/f.Lmax))*(.72+.28*Math.sin(f.L*48+f.sd)+.16*Math.sin(f.L*131+f.sd*3)),sq=Math.min(8,c0.pu/c0.pv),wp=Math.max(1.4,wv*c0.pv),x0=c0.x,y0=c0.y,x1=c1.x,y1=c1.y,col=f.col;
   if(Math.abs(x1-x0)<r[2]/2)rpaint(d,R,x0,wp*sq*1.3+Math.abs(x1-x0)+3,(g,o)=>{g.save();g.scale(sq,1);const X0=(x0+o)/sq,X1=(x1+o)/sq;g.globalCompositeOperation='source-over';g.lineCap='round';g.beginPath();g.moveTo(X0,y0);g.lineTo(X1,y1);g.strokeStyle=col;g.lineWidth=wp;g.stroke();
    g.globalCompositeOperation='destination-over';g.strokeStyle='rgba(172,14,26,.55)';g.lineWidth=wp*1.7+2;g.stroke();g.globalCompositeOperation='source-over';
@@ -4138,7 +4143,8 @@ function updFlows(dt){if(dt<=0)return;
   f.th=th1;f.t=t1;f.L+=sp}}
 function addBodyDrip(d,R,th,t,w,len){if(BDRIPS.length>260||REG[R].ax!=='y')return;BDRIPS.push({d,R,th,t,w:w||rnd(.006,.011),len:len||rnd(.25,.75)*(w>.012?1.5:1),col:'rgb('+(108+ri(22))+',2,8)',sd:rnd(0,9)})}
 const SOAKR={pelvis:['torso',.8,1.035],belly:['torso',1.035,1.205],chest:['torso',1.205,1.49],head:['head',1.48,1.725],uaL:['armL',1.15,1.48],laL:['armL',.77,1.15],uaR:['armR',1.15,1.48],laR:['armR',.77,1.15],ulL:['legL',.48,.93],llL:['legL',.04,.48],ulR:['legR',.48,.93],llR:['legR',.04,.48]};
-function soakPart(d,k){const sr=SOAKR[k];if(!sr)return;const body=d.P[k].b;BQ.set(body.quaternion.x,body.quaternion.y,body.quaternion.z,body.quaternion.w).invert();BDL.set(0,-1,0).applyQuaternion(BQ);
+function soakPart(d,k){WDROPF=1;try{soakPart_(d,k)}finally{WDROPF=0}}
+function soakPart_(d,k){const sr=SOAKR[k];if(!sr)return;const body=d.P[k].b;BQ.set(body.quaternion.x,body.quaternion.y,body.quaternion.z,body.quaternion.w).invert();BDL.set(0,-1,0).applyQuaternion(BQ);
  const th=((Math.atan2(BDL.x,BDL.z)%TAU)+TAU)%TAU,ss=d.soakS||(d.soakS={}),L=ss[k]||(ss[k]=[]);
  for(const o of L){const df=Math.abs(((th-o.th)%TAU+TAU*1.5)%TAU-Math.PI);if(df<.6){if(o.n>=3)return;o.n++;paintSoak(d,REG[sr[0]],sr,o);return}}
  if(L.length>=4)return;const o={th,n:1,seed:ri(1e9)};L.push(o);paintSoak(d,REG[sr[0]],sr,o)}
@@ -6481,43 +6487,92 @@ function wdClAt(d,R,t){const k=rkey(R);if(!k||!d.cl||!d.cl.on[k])return false;fo
 // то, что рисуется на коже, — и на ткани: сначала размыто (кровь расходится по нитям), потом само пятно
 function wdClPaint(d,R,x,rad,fn){const L=d.cl;if(!L)return;const k=rkey(R);if(!k||!L.on[k])return;const g=L.bg,r=R.rect;
  g.save();g.beginPath();g.rect(r[0],r[1],r[2],r[3]);g.clip();
- if(HASFILTER){g.filter='blur(2.2px)';g.globalAlpha=.75;fn(g,0);if(x-rad<r[0])fn(g,r[2]);if(x+rad>r[0]+r[2])fn(g,-r[2]);g.filter='none'}
- g.globalAlpha=.92;fn(g,0);if(x-rad<r[0])fn(g,r[2]);if(x+rad>r[0]+r[2])fn(g,-r[2]);g.restore();L.dirty=true;L.wet=Math.min(4,L.wet+.25);L.rect.add(k)}
-// ---- пятно от раны на ткани (как в Project Carl): вокруг раны ткань намокает, пятно растёт с кровопотерей и ползёт вниз по ткани;
-// середина темнее (там пропитано насквозь), край ровный; на светлом — тёмно-красное, на джинсах — почти чёрное. Кожные потоки под тканью не рисуются.
-const WSP=new V3();
-function wdStainDraw(d,R,th,t,dir,A,S,core){const L=d.cl,g=L.bg,r=R.rect,co=coAt(R,th,t),sy=r[3]/(R.t1-R.t0),pu=co.pu;
- // размеры в метрах: длина — по силе тяжести, ширина — поперёк
- const sq=Math.sqrt(A),Lg=sq*(1.05+.9*S.el),Wd=A/Math.max(1e-4,Lg)*1.3,ux=dir[0],uy=dir[1];
- const draw=(o)=>{g.save();g.translate(co.x+o,co.y);g.scale(pu,sy);const G=rng(S.seed+S.n*17);
-  // мягкий ореол (кровь расходится по нитям), потом само пятно, потом пропитанная середина
-  for(const[k,al,col]of[[1.14,.16,'126,12,18'],[1,.42,'116,8,14'],[.6,.38,'98,4,10']]){const n=26,cx=ux*Lg*.38,cy=uy*Lg*.38;g.beginPath();
-   for(let i=0;i<=n;i++){const a=i/n*TAU,c=Math.cos(a),sn=Math.sin(a),f=k*(1+.05*Math.sin(a*3+S.seed)+.035*Math.sin(a*5+S.seed*1.7)),
-     // вытянутый «каплей» эллипс: вдоль силы тяжести длиннее, сверху (у раны) — уже
-     al2=c*Lg*.55*f,ac=sn*Wd*.5*f*(c<0?.82:1),x=cx+ux*al2-uy*ac,y=cy+uy*al2+ux*ac;i?g.lineTo(x,y):g.moveTo(x,y)}
-   g.closePath();g.fillStyle='rgba('+col+','+(al*(core?1:.7)).toFixed(3)+')';g.fill()}
-  g.restore()};
- g.save();g.beginPath();g.rect(r[0],r[1],r[2],r[3]);g.clip();if(HASFILTER)g.filter='blur(.7px)';draw(0);const span=(Lg+Wd)*pu;if(co.x-span<r[0])draw(r[2]);if(co.x+span>r[0]+r[2])draw(-r[2]);g.restore();L.dirty=true}
-function wdStains(d,dt){const L=d.cl;if(!L)return;const live=d.alive||(d.deadT||0)<90;
- for(const w of d.wounds){if(!w.R||w.cs===null)continue;const R=REG[w.R];if(!R)continue;
-  if(w.cs===undefined){if(!wdClAt(d,R,w.pt)){w.cs=null;continue}w.cs={v:0,dv:0,n:0,seed:ri(1e9),el:0,gx:0,gy:-1};
-   // дырочка в ткани
-   const co=coAt(R,w.th,w.pt),g=L.bg;g.save();g.beginPath();g.rect(R.rect[0],R.rect[1],R.rect[2],R.rect[3]);g.clip();g.fillStyle='rgba(38,0,4,.95)';g.beginPath();g.ellipse(co.x,co.y,Math.max(1.2,.0024*co.pu),Math.max(1.2,.0024*co.pv),0,0,TAU);g.fill();g.restore();L.dirty=true}
-  const S=w.cs;if(!live)continue;
-  const I=(w.own?w.rate*Math.max(0,1-w.t/3):w.rate*d.press*(d.capK===undefined?1:d.capK))*(w.plug?.3:1);if(I>0)S.v+=I*dt*1000;
-  // сила тяжести по ткани у раны: стоит — вниз по телу, лежит — вбок, к полу
-  const gr=gravAt(d,R,w.th,w.pt),tg=Math.max(1e-3,gr.tang);S.gx+=(gr.ar/tg-S.gx)*Math.min(1,dt*2);S.gy+=(gr.al/tg-S.gy)*Math.min(1,dt*2);S.el=clamp(tg,0,1);
-  if(S.v<S.dv*1.12+.25)continue;S.dv=S.v;S.n++;
-  // площадь пятна: ~2,5 см² на мл (хлопок), не больше рубашки
-  const A=Math.min(.045,S.v*2.5e-4),gl=Math.hypot(S.gx,S.gy)||1,dir=[S.gx/gl,S.gy/gl];
-  wdStainDraw(d,R,w.th,w.pt,dir,A,S,true);
-  // пятно ушло ниже торса — продолжается на штанине
-  if(w.R==='torso'){const ext=Math.sqrt(A)*1.6*Math.abs(dir[1]),tEnd=w.pt+dir[1]*ext;if(tEnd<.96&&dir[1]<-.3){const ab=R.f(clamp(w.pt,Math.min(R.t0,R.t1),Math.max(R.t0,R.t1))),bx=R.cx+ab[0]*Math.sin(w.th),bz=R.cz+ab[1]*Math.cos(w.th),k=bx>0?'legR':'legL',LR=REG[k];
-    if(LR&&d.cl.on[k]){const thL=Math.atan2(bx-LR.cx,bz-LR.cz),A2=A*clamp((.96-tEnd)/Math.max(.02,ext),0,1)*.8;if(A2>2e-4)wdStainDraw(d,LR,thL,.95,[0,-1],A2,S,true)}}}}}
-function wdCloth(d,dt){const L=d.cl;if(!L)return;L.t-=dt;L.st-=dt;try{wdStains(d,dt)}catch(e){bugLog('stain',e)}
- // мокрое пятно расползается по ткани (впитывается), со временем — медленнее
- if(L.wet>0&&L.st<=0&&HASFILTER){L.st=.35;L.wet=Math.max(0,L.wet-.08);const g=L.bg;g.save();g.filter='blur(1.1px)';g.globalAlpha=.45;for(const k of L.rect){const r=REG[k].rect;g.drawImage(L.bc,r[0],r[1],r[2],r[3],r[0],r[1],r[2],r[3])}g.restore();if(L.wet<=0)L.rect.clear();L.dirty=true}
- if(L.dirty&&L.t<=0){L.t=.12;L.dirty=false;const g=L.cg;g.globalCompositeOperation='copy';g.drawImage(L.base,0,0);g.globalCompositeOperation='multiply';g.globalAlpha=.96;g.drawImage(L.bc,0,0);g.globalCompositeOperation='destination-in';g.globalAlpha=1;g.drawImage(L.base,0,0);g.globalCompositeOperation='source-over';L.tex.needsUpdate=true}}
+ if(HASFILTER){g.filter='blur(1px)';g.globalAlpha=.6;fn(g,0);if(x-rad<r[0])fn(g,r[2]);if(x+rad>r[0]+r[2])fn(g,-r[2]);g.filter='none'}
+ g.globalAlpha=.9;fn(g,0);if(x-rad<r[0])fn(g,r[2]);if(x+rad>r[0]+r[2])fn(g,-r[2]);g.restore();L.dirty=true;L.wet=Math.min(4,L.wet+.25);L.rect.add(k)}
+// ---- кровь на ткани (как в Project Carl) ----
+// У раны под тканью — пятно: растёт, пока идёт кровь (радиус до ~3,5 см; где кровь не стекает — у лежащего — до ~5 см).
+// От пятна ткань намокает вниз по силе тяжести полосой: у раны чуть уже пятна, книзу шире (капля-«язык», как в Project Carl);
+// у ремня кровь собирается и идёт дальше в брюки и по штанине вниз. По горизонтальной ткани полоса не ползёт:
+// на лежащей ноге кровь уходит по кругу к низу ноги и там стоит. Кровь с кожи, дошедшая до ткани (шея, голень), впитывается там же.
+// Цвет ровный: каждое касание — тот же цвет поверх; край мягкий (узкое полупрозрачное кольцо).
+const CLR='125,22,30',CLRD='84,6,12',CLRH='30,0,3';
+function wdClPen(d){const g=d.cl.bg;let cur=null;
+ const clip=R=>{if(cur===R)return;if(cur)g.restore();g.save();const r=R.rect;g.beginPath();g.rect(r[0],r[1],r[2],r[3]);g.clip();cur=R};
+ return{
+  // эллипс: rad — в метрах по поверхности; ex, ey — растяжение вокруг / вдоль
+  dot(R,th,t,rad,col,a,ex,ey){clip(R);const r=R.rect,co=coAt(R,th,t),rx=Math.max(.7,rad*co.pu*(ex||1)),ry=Math.max(.7,rad*co.pv*(ey||1));g.fillStyle=a<1?'rgba('+col+','+a+')':'rgb('+col+')';
+   for(const o of[0,r[2],-r[2]]){const X=co.x+o;if(X+rx<r[0]||X-rx>r[0]+r[2])continue;g.beginPath();g.ellipse(X,co.y,rx,ry,0,0,TAU);g.fill()}},
+  // неровное пятно (лепестки lob), книзу вытянуто: (gx,gy) — сила тяжести по поверхности (вокруг, вдоль t)
+  blob(R,th,t,rad,lob,gx,gy,col,a){clip(R);const r=R.rect,co=coAt(R,th,t),sg=Math.sign(R.t1-R.t0),P=[],ext=rad*1.7*co.pu;
+   for(let i=0;i<28;i++){const an=i/28*TAU,c=Math.cos(an),s=Math.sin(an),f=1+lob[0]*Math.sin(2*an+lob[1])+lob[2]*Math.sin(3*an+lob[3])+lob[4]*Math.sin(5*an+lob[5]),dn=Math.max(0,c*gx+s*gy),e=rad*f*(1+.32*dn*dn);P.push(c*e*co.pu,s*e*co.pv*sg)}
+   g.fillStyle=a<1?'rgba('+col+','+a+')':'rgb('+col+')';
+   for(const o of[0,r[2],-r[2]]){const X=co.x+o;if(X+ext<r[0]||X-ext>r[0]+r[2])continue;g.beginPath();for(let i=0;i<P.length;i+=2)i?g.lineTo(X+P[i],co.y+P[i+1]):g.moveTo(X+P[i],co.y+P[i+1]);g.closePath();g.fill()}},
+  end(){if(cur)g.restore();cur=null;d.cl.dirty=true}}}
+// источник крови на ткани: рана под тканью (k=1, hole — дырка) или место, где поток с кожи зашёл под ткань (k — доля крови)
+function wdSrcAdd(d,w,R,th,t,k,hole){const L=d.cl,s=L.src||(L.src=[]);if(s.length>=20)return null;const G=rng(ri(1e9));
+ const S={w,R,th,t,k,hole,v:0,rd:0,bw:0,fl:[],vs:0,gT:0,gw:null,pT:0,lob:[.07+G()*.06,G()*TAU,.04+G()*.04,G()*TAU,.02+G()*.03,G()*TAU],sd:G()*9};s.push(S);return S}
+function wdClEnter(d,w,R,th,t){const L=d.cl;if(!L||!w||!REG[R])return;
+ for(const o of L.src||[])if(o.R===R&&Math.abs(o.t-t)<.04&&Math.abs((((o.th-th)%TAU)+TAU*1.5)%TAU-Math.PI)<.3)return;
+ wdSrcAdd(d,w,R,th,t,.45,0)}
+function regRad(R,t){const ab=R.f(clamp(t,Math.min(R.t0,R.t1),Math.max(R.t0,R.t1)));return Math.max(.012,(ab[0]+ab[1])/2)}
+// стык торса и штанины (t .85–.95): полоса идёт по торсу (его сетка снаружи) и та же — на штанине под ним
+// (угол штанины — по тому же месту x,z), ниже .85 — только по штанине; так полоса без скачка
+function wdAlt(k,R,th,t){if(k!=='torso'||t<.85||t>=.95)return null;const ab=R.f(t),x=R.cx+ab[0]*Math.sin(th),z=R.cz+ab[1]*Math.cos(th);
+ if(Math.abs(x)<.03)return null;const k2=x>0?'legR':'legL',L2=REG[k2];return[k2,Math.atan2(x-L2.cx,z-L2.cz)]}
+function wdBandDot(pen,d,S,f,p){const R=REG[p.R],alt=wdAlt(p.R,R,p.th,p.t),R2=alt&&wdClAt(d,REG[alt[0]],p.t)?REG[alt[0]]:null,
+  rad=Math.min(regRad(R,p.t),R2?regRad(R2,p.t):9),j=1+.08*Math.sin(p.L*55+f.sd)+.05*Math.sin(p.L*131+f.sd*2.3),
+  hw=Math.min(rad*.45,S.bw*(.85+.35*Math.min(1,p.L/.14))*j),ex=p.hem?1.45:1,ey=p.hem?.7:1;
+ pen.dot(R,p.th,p.t,hw*1.12+.001,CLR,.33,ex,ey);pen.dot(R,p.th,p.t,hw,CLR,1,ex,ey);
+ if(R2){pen.dot(R2,alt[1],p.t,hw*1.12+.001,CLR,.33,ex,ey);pen.dot(R2,alt[1],p.t,hw,CLR,1,ex,ey)}}
+function wdSpotDraw(pen,S){const R=REG[S.R],gw=S.gw,tg=gw?Math.min(.8,gw.tang):0,gx=tg>.05?gw.ar/gw.tang*tg:0,gy=tg>.05?gw.al/gw.tang*tg:0;
+ pen.blob(R,S.th,S.t,S.rd*1.1+.0012,S.lob,gx,gy,CLR,.33);pen.blob(R,S.th,S.t,S.rd,S.lob,gx,gy,CLR,1);
+ if(S.hole){pen.blob(R,S.th,S.t,S.rd*.45,S.lob,gx,gy,CLRD,.3);if(S.hole===3)pen.dot(R,S.th,S.t,.0045,CLRH,1,.22,1);else pen.dot(R,S.th,S.t,S.hole>1?.0042:.0028,CLRH,1)}}
+// шаг полосы: вниз по ткани, только если ткань наклонена круче ~15° (ткань впитывает — по пологой кровь не идёт, пятно растёт);
+// переходы шея → торс → штанина; конец — край ткани
+function wdBandStep(d,S,f,I,dt){const Lmax=Math.min(.5,.04+(S.v-f.v0)*.035);if(f.L>=Lmax)return null;const R=REG[f.R];
+ if(d.P[boneAt(R,f.t)].b.angularVelocity.lengthSquared()>6)return null;   // дёрнулся / падает — кровь в ткани за это время не бежит
+ const gr=gravAt(d,R,f.th,f.t),tg=gr.tang;if(tg<.25){f.stall=(f.stall||0)+dt;return null}f.stall=0;
+ const sp=Math.min(Lmax-f.L,dt*.03*clamp(I/.0006,.5,1.6)*clamp((tg-.2)*1.4,.1,1)*(f.R[0]==='l'||f.t<1?.45:1)),rad=regRad(R,f.t);
+ let th1=f.th+gr.ar/tg*sp/rad+Math.sin(f.t*40+f.sd)*sp*.06/rad,t1=f.t+gr.al/tg*sp,k=f.R;
+ if(k==='head'&&t1<1.468)k='torso';
+ else if(k==='torso'&&t1<.85){const ab=R.f(t1),x=R.cx+ab[0]*Math.sin(th1),z=R.cz+ab[1]*Math.cos(th1);if(Math.abs(x)>.035||t1<.81){k=x>0||(x===0&&f.sd>4.5)?'legR':'legL';const L2=REG[k];th1=Math.atan2(x-L2.cx,z-L2.cz)}}
+ const R1=REG[k],lo=Math.min(R1.t0,R1.t1),hi=Math.max(R1.t0,R1.t1);
+ if(t1<lo+.004||t1>hi-.004||!wdClAt(d,R1,t1)){f.done=true;return{R:f.R,th:f.th,t:f.t,L:f.L,hem:1}}
+ const hem=k==='torso'&&f.t>=1&&t1<1;f.R=k;f.th=th1;f.t=t1;f.L+=sp;f.acc=(f.acc||0)+sp;
+ if(f.acc>=.004||hem){f.acc=0;return{R:k,th:th1,t:t1,L:f.L,hem:hem?1:0}}return null}
+// новая полоса — от края пятна вниз (по силе тяжести у раны; если у раны ткань ровная — туда, где по краю пятна круче)
+function wdBandNew(d,S){const R=REG[S.R];if(R.ax!=='y'||S.fl.length>=3)return;const rad=regRad(R,S.t);let g=S.gw,ux,uy,th=S.th,t=S.t,dd=S.rd*.45;
+ if(g.tang>.08){ux=g.ar/g.tang;uy=g.al/g.tang}
+ else{let best=.22;for(let i=0;i<8;i++){const a=i/8*TAU,cx=Math.cos(a),cy=Math.sin(a),th2=S.th+cx*S.rd/rad,t2=S.t+cy*S.rd;if(!wdClAt(d,R,t2))continue;
+   const g2=gravAt(d,R,th2,t2);if(g2.tang>best&&(g2.ar*cx+g2.al*cy)/g2.tang>.4){best=g2.tang;ux=g2.ar/g2.tang;uy=g2.al/g2.tang;dd=S.rd*.9}}
+  if(ux===undefined)return}
+ for(const o of S.fl)if(o.ux*ux+o.uy*uy>.77)return;
+ const t1=t+uy*dd;if(t1<Math.min(R.t0,R.t1)+.005||t1>Math.max(R.t0,R.t1)-.005||!wdClAt(d,R,t1))return;
+ if(!S.bw)S.bw=S.rd;const f={R:S.R,th:th+ux*dd/rad,t:t1,L:0,ux,uy,v0:S.v,sd:S.sd+S.fl.length*2.7,pts:[],done:false,stall:0,acc:0};
+ // первые точки — от середины пятна до головы полосы (без щели между пятном и полосой)
+ for(let i=0;i<=2;i++){const k=i/2;f.pts.push({R:S.R,th:S.th+ux*dd*k/rad,t:S.t+uy*dd*k,L:0,hem:0})}S.fl.push(f);S.vs=S.v;return f}
+function wdStains(d,dt){const L=d.cl;if(!L)return;
+ for(const w of d.wounds){if(w.cs!==undefined||!w.R)continue;const R=REG[w.R];if(!R||!wdClAt(d,R,w.pt)){w.cs=null;continue}w.cs=1;wdSrcAdd(d,w,w.R,w.th,w.pt,1,w.cut?3:w.exit?2:1)}
+ const SS=L.src;if(!SS||!SS.length)return;if(!(d.alive||(d.deadT||0)<90))return;
+ for(const S of SS){const w=S.w,R=REG[S.R];
+  const I=(w.own?w.rate*Math.max(0,1-w.t/3):w.rate*d.press*(d.capK===undefined?1:d.capK))*(w.plug?.3:1)*S.k;if(!(I>0))continue;S.v+=I*dt*1000;
+  S.gT-=dt;if(S.gT<=0||!S.gw){S.gT=.25;S.gw=gravAt(d,R,S.th,S.t)}
+  const rad=regRad(R,S.t),lev=clamp(1-S.gw.tang/.4,0,1),wound=S.k>=1,
+   cap=Math.min((wound?.034:.016)+(wound?.014:.008)*lev,rad*(wound?.7:.5)),rt=Math.min(cap,(wound?.008:.004)+Math.sqrt(S.v)*(wound?.01:.0055)*(1+.3*lev));
+  let pen=null,spot=false,full=false;
+  if(rt>S.rd+.0008){S.rd=rt;spot=true;if(S.bw&&rt>S.bw*1.12+.0005){S.bw=rt;full=true}}
+  // полосы
+  const fresh=[];
+  if(S.v>(wound?1:.04)&&S.fl.length<3&&!S.fl.some(f=>!f.done&&f.stall<1.5)&&(S.fl.length===0||S.v-S.vs>1.5)){S.pT-=dt;if(S.pT<=0){S.pT=.5;const f=wdBandNew(d,S);if(f)for(const p of f.pts)fresh.push([f,p])}}
+  for(const f of S.fl){if(f.done)continue;const p=wdBandStep(d,S,f,I,dt);if(p){f.pts.push(p);fresh.push([f,p])}}
+  if(!spot&&!fresh.length)continue;pen=wdClPen(d);
+  if(full){for(const f of S.fl)for(const p of f.pts)wdBandDot(pen,d,S,f,p);wdSpotDraw(pen,S)}
+  else{let near=spot;for(const[f,p]of fresh){wdBandDot(pen,d,S,f,p);if(p.L<S.rd*2.2)near=true}if(near)wdSpotDraw(pen,S)}
+  pen.end()}}
+// ткань с кровью: ткань → умножить на кровь (на светлом — алый, на тёмном — почти чёрный) → лёгкий красный поверх (тёмная ткань — бордовая)
+function wdCloth(d,dt){const L=d.cl;if(!L)return;L.t-=dt;try{wdStains(d,dt)}catch(e){bugLog('stain',e)}
+ if(L.dirty&&L.t<=0){L.t=.12;L.dirty=false;const g=L.cg;g.globalCompositeOperation='copy';g.drawImage(L.base,0,0);g.globalCompositeOperation='multiply';g.globalAlpha=1;g.drawImage(L.bc,0,0);
+  g.globalCompositeOperation='source-over';g.globalAlpha=.12;g.drawImage(L.bc,0,0);g.globalCompositeOperation='destination-in';g.globalAlpha=1;g.drawImage(L.base,0,0);g.globalCompositeOperation='source-over';L.tex.needsUpdate=true}}
 return{pose:it=>{const s=it.wdS;if(s&&s.qr&&KN.s===s){wdPose(s,it,it.g.position,it.g.quaternion);return true}return false},DOLLS,DMESH,add:wdAdd,spawn:wdSpawn,clear:wdClear,pre:wdPre,post:wdPost,ray:wdRay,shot:wdShot,near:wdNear,dropHit:wdDropHit,
  vrGrab:wdVrGrab,vrKnife:wdVrKnife,park:wdPark,grab2D:wd2DGrab,grab2DUpd:wd2DGrabUpd,isGrab2D:()=>!!grab,stab2D:wd2DStab,pull2D:wd2DPull,push2D:wd2DPush,leave2D:wd2DLeave,parkedNear:wdParkedNear,take2D:wd2DTake,
  KN,NG,ngBuild,get AIOFF(){return AIOFF},set AIOFF(v){AIOFF=v},hitDoll,toRag,die,PISTOL,VRS:VR,cam}})();
