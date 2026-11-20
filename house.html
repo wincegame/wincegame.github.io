@@ -3822,6 +3822,7 @@ const VRC={kgrip:3,hap:true};
 const KL=.18;
 // ползёт — скользит (меньше трения), как в Wince
 const SLIDEM=new CANNON.Material('wdslide');
+let WDROPF=0;
 // игрок (для поиска свободного места)
 const PL={x:0,z:0,feet:0,vy:0,yaw:0,pitch:0};
 // оружие в руках игрока: манекен замечает, что в него целятся из пистолета
@@ -3925,7 +3926,8 @@ function dollSph(d){if(d._sf===DSF&&d._sp)return d._sp;let sp=d._sp;if(!sp){sp=d
  for(const s of sp){s.b.quaternion.vmult(s.b.shapeOffsets[s.i],C1);s.x=s.b.position.x+C1.x;s.y=s.b.position.y+C1.y;s.z=s.b.position.z+C1.z}d._sf=DSF;return sp}
 function bodyHit(q,p){if(VR.on&&handHit(q,p))return true;if(wpnHit(q,p))return true;for(const d of DOLLS){if(!d.skin||(d===q.src&&q.t<.1))continue;const pe=d.P.pelvis.b.position,dx=p.x-pe.x,dy=p.y-pe.y,dz=p.z-pe.z;if(dx*dx+dy*dy+dz*dz>1.5)continue;
  for(const s of dollSph(d)){const ex=p.x-s.x,ey=p.y-s.y,ez=p.z-s.z;if(ex*ex+ey*ey+ez*ez<s.r*s.r){dropOn(d,s.k,p,q);return true}}}return false}
-function dropOn(d,k,p,q){const b=d.P[k].b,c=PDM[k].c;C1.set(p.x,p.y,p.z);b.pointToLocalFrame(C1,C2);const rp=T4.set(C2.x+c[0],C2.y+c[1],C2.z+c[2]),key=regionOf(k,rp),R=REG[key],co=regCoord(R,rp);
+function dropOn(d,k,p,q){WDROPF=1;try{dropOn_(d,k,p,q)}finally{WDROPF=0}}
+function dropOn_(d,k,p,q){const b=d.P[k].b,c=PDM[k].c;C1.set(p.x,p.y,p.z);b.pointToLocalFrame(C1,C2);const rp=T4.set(C2.x+c[0],C2.y+c[1],C2.z+c[2]),key=regionOf(k,rp),R=REG[key],co=regCoord(R,rp);
  const sp=q.v.length(),d0=dropD0(q),rw=d0*(1.05+.55*Math.sqrt(Math.min(sp,9)))/2*co.pv,rr=Math.max(.5,rw),al=rw<.5?clamp((rw/.5)**2*2.2,.15,1):1,sx=co.pu/co.pv,X=co.x,Y=co.y,el=1+Math.min(1.1,sp*.07),col=kcol(q.k),nsat=sp>4.5&&d0>2e-3?1+ri(3):0,seed=Math.random()*TAU;
  rpaint(d,R,X,rr*sx*el*3.4+4,(g,o)=>{g.globalAlpha=al;g.fillStyle=col;g.beginPath();g.ellipse(X+o,Y,rr*sx*el,rr,0,0,TAU);g.fill();
   for(let i=0;i<nsat;i++){const a=seed+i*1.9,dd=rr*(1.7+((i*.37)%1)*1.6);g.beginPath();g.arc(X+o+Math.cos(a)*dd*sx,Y+Math.sin(a)*dd,Math.max(.5,rr*(.2+((i*.61)%1)*.25)),0,TAU);g.fill()}g.globalAlpha=1});
@@ -4077,7 +4079,7 @@ function regionOf(k,rp){const s=k[2];if(k==='head')return rp.y<1.468?'torso':'he
 function regCoord(R,rp){const r=R.rect;let th,t;if(R.ax==='y'){th=Math.atan2(rp.x-R.cx,rp.z-R.cz);t=rp.y}else{th=Math.atan2(rp.x-R.cx,rp.y-R.cy);t=rp.z}
  if(th<0)th+=TAU;const s=clamp((t-R.t0)/(R.t1-R.t0),0,1),ab=R.f(clamp(t,Math.min(R.t0,R.t1),Math.max(R.t0,R.t1))),rad=Math.max(.012,(ab[0]+ab[1])/2);
  return{x:r[0]+th/TAU*r[2],y:r[1]+s*r[3],pu:r[2]/(TAU*rad),pv:r[3]/Math.abs(R.t1-R.t0),th,t}}
-function rpaint(d,R,x,rad,fn){const g=d.skin.g,r=R.rect;g.save();g.beginPath();g.rect(r[0],r[1],r[2],r[3]);g.clip();fn(g,0);if(x-rad<r[0])fn(g,r[2]);if(x+rad>r[0]+r[2])fn(g,-r[2]);g.restore();d.skin.dirty=true;d.skin.bloody=true;if(d.cl)wdClPaint(d,R,x,rad,fn)}
+function rpaint(d,R,x,rad,fn){const g=d.skin.g,r=R.rect;g.save();g.beginPath();g.rect(r[0],r[1],r[2],r[3]);g.clip();fn(g,0);if(x-rad<r[0])fn(g,r[2]);if(x+rad>r[0]+r[2])fn(g,-r[2]);g.restore();d.skin.dirty=true;d.skin.bloody=true;if(d.cl&&WDROPF)wdClPaint(d,R,x,rad,fn)}
 const FLOWS=[];
 function coAt(R,th,t){const r=R.rect,ab=R.f(clamp(t,Math.min(R.t0,R.t1),Math.max(R.t0,R.t1))),rad=Math.max(.012,(ab[0]+ab[1])/2);
  return{x:r[0]+(((th%TAU)+TAU)%TAU)/TAU*r[2],y:r[1]+clamp((t-R.t0)/(R.t1-R.t0),0,1)*r[3],pu:r[2]/(TAU*rad),pv:r[3]/Math.abs(R.t1-R.t0)}}
@@ -6289,7 +6291,12 @@ try{sknBuild()}catch(e){bugLog('skin',e)}
 // дом сам по себе: стены, пол и мебель — в физике дома; манекены сталкиваются с ними, с вещами и друг с другом
 const WDM=new CANNON.Material('wdflesh');
 world.addContactMaterial(new CANNON.ContactMaterial(WDM,WDM,{friction:.8,restitution:.02}));
-{const T=new CANNON.Material('wdhouse');for(const b of world.bodies)if(b.mass===0&&!b.material&&b.collisionFilterGroup===2)b.material=T;
+// у cannon 0.6 маска по умолчанию — 1: пол, стены, мебель и двери дома сталкивались только с вещами; манекены проходили сквозь всё и «стояли» на полу
+// только за счёт страховки по высоте (поэтому скользили как по льду). Wince в своей комнате это исправлял (маска −1), здесь — то же для дома:
+// неподвижным телам дома — бит манекенов (8) и материал с трением как в Wince (0,8)
+const WHM=new CANNON.Material('wdhouse');let WFIX=0;
+function wdFixStatics(){const n=world.bodies.length;if(WFIX===n)return;WFIX=n;for(const b of world.bodies){if(b.mass!==0||b.collisionFilterGroup!==2)continue;b.collisionFilterMask|=8;if(!b.material)b.material=WHM}}
+{const T=WHM;for(const b of world.bodies)if(b.mass===0&&!b.material&&b.collisionFilterGroup===2)b.material=T;
  world.addContactMaterial(new CANNON.ContactMaterial(WDM,T,{friction:.8,restitution:.02}));world.addContactMaterial(new CANNON.ContactMaterial(FLESHM,T,{friction:.8,restitution:.02}));world.addContactMaterial(new CANNON.ContactMaterial(SLIDEM,T,{friction:.2,restitution:.02}));}
 // части тела: свой бит столкновений (8) — с полом/мебелью (2), вещами (1), руками и друг с другом
 function wdBodies(d){for(const k in d.P){const b=d.P[k].b;b.collisionFilterGroup=8;b.collisionFilterMask=1|2|4|8;b.allowSleep=false;if(!b.material||b.material===null)b.material=FLESHM}}
@@ -6300,7 +6307,14 @@ function wdSync(){wdCam();VR.on=WDH.VR.on;PL.x=WDH.PL.x;PL.z=WDH.PL.z;PL.feet=WD
  // в руке пистолет — манекен видит, что в него целятся
  let gun=null;for(const h of(WDH.VR.on?WDH.VR.C:[])){if(h.held&&h.held.type==='pistol')gun=h.held}if(!WDH.VR.on){const L=[WDH.PL.held,WDH.PL.off];for(const it of L)if(it&&it.type==='pistol')gun=it}
  WPN[0].nogun=!gun;PLG.gun=!!gun;if(gun){try{gun.g.updateMatrixWorld();PLG.dir=(PLG.dir||new V3()).set(0,0,-1).transformDirection((gun.gu&&gun.gu.m||gun.g).matrixWorld)}catch(e){PLG.dir=null}}}
-function wdPre(rdt){WFR++;wdSync();if(!NG.b)ngBuild();if(WFR%20===0)ngDoors();const dt=rdt;DSF++;
+// кисти в VR — тоже тела: толкают манекенов (быстро — как удар, Wince сам решает, как отреагировать)
+const WHB=new Map();
+function wdHands(dt){if(!WDH.VR.on){for(const b of WHB.values())b.collisionResponse=false;return}const ir=1/Math.max(dt,1e-3);
+ for(const H of WDH.VR.C){if(!H.src||!H.pos)continue;let b=WHB.get(H);if(!b){b=new CANNON.Body({mass:0,type:CANNON.Body.KINEMATIC});b.addShape(new CANNON.Sphere(.042));b.collisionFilterGroup=4;b.collisionFilterMask=8;b.hcol=1;b.hv=new CANNON.Vec3();world.addBody(b);WHB.set(H,b);b.position.set(H.pos.x,H.pos.y,H.pos.z)}
+  const c=VR.C.find(x=>x.H===H),busy=!!(H.held||H.magOut||(c&&c.g));b.collisionResponse=!busy;
+  b.hv.set((H.pos.x-b.position.x)*ir,(H.pos.y-b.position.y)*ir,(H.pos.z-b.position.z)*ir);const l=b.hv.length();if(l>12)b.hv.scale(12/l,b.hv);
+  if(busy||l>8){b.position.set(H.pos.x,H.pos.y,H.pos.z);b.velocity.set(0,0,0)}else b.velocity.copy(b.hv)}}
+function wdPre(rdt){WFR++;if(WFR%30===1)wdFixStatics();wdSync();try{if(DOLLS.length)wdHands(rdt)}catch(e){bugLog('wdhands',e)}if(!NG.b)ngBuild();if(WFR%20===0)ngDoors();const dt=rdt;DSF++;
  if(!DOLLS.length&&!KN.s)return;
  for(const d of DOLLS){try{health(d,dt);breathe(d,dt);if(d.tw&&!d.alive)twitch(d,dt);if(d.flinch>0)d.flinch-=dt;if(d.bumpT>0)d.bumpT-=dt;
    if(d.clutch>0)d.clutch-=dt;d.perT-=dt;if(d.perT<=0){d.perT=.2;perceive(d)}
@@ -6469,7 +6483,38 @@ function wdClPaint(d,R,x,rad,fn){const L=d.cl;if(!L)return;const k=rkey(R);if(!k
  g.save();g.beginPath();g.rect(r[0],r[1],r[2],r[3]);g.clip();
  if(HASFILTER){g.filter='blur(2.2px)';g.globalAlpha=.75;fn(g,0);if(x-rad<r[0])fn(g,r[2]);if(x+rad>r[0]+r[2])fn(g,-r[2]);g.filter='none'}
  g.globalAlpha=.92;fn(g,0);if(x-rad<r[0])fn(g,r[2]);if(x+rad>r[0]+r[2])fn(g,-r[2]);g.restore();L.dirty=true;L.wet=Math.min(4,L.wet+.25);L.rect.add(k)}
-function wdCloth(d,dt){const L=d.cl;if(!L)return;L.t-=dt;L.st-=dt;
+// ---- пятно от раны на ткани (как в Project Carl): вокруг раны ткань намокает, пятно растёт с кровопотерей и ползёт вниз по ткани;
+// середина темнее (там пропитано насквозь), край ровный; на светлом — тёмно-красное, на джинсах — почти чёрное. Кожные потоки под тканью не рисуются.
+const WSP=new V3();
+function wdStainDraw(d,R,th,t,dir,A,S,core){const L=d.cl,g=L.bg,r=R.rect,co=coAt(R,th,t),sy=r[3]/(R.t1-R.t0),pu=co.pu;
+ // размеры в метрах: длина — по силе тяжести, ширина — поперёк
+ const sq=Math.sqrt(A),Lg=sq*(1.05+.9*S.el),Wd=A/Math.max(1e-4,Lg)*1.3,ux=dir[0],uy=dir[1];
+ const draw=(o)=>{g.save();g.translate(co.x+o,co.y);g.scale(pu,sy);const G=rng(S.seed+S.n*17);
+  // мягкий ореол (кровь расходится по нитям), потом само пятно, потом пропитанная середина
+  for(const[k,al,col]of[[1.14,.16,'126,12,18'],[1,.42,'116,8,14'],[.6,.38,'98,4,10']]){const n=26,cx=ux*Lg*.38,cy=uy*Lg*.38;g.beginPath();
+   for(let i=0;i<=n;i++){const a=i/n*TAU,c=Math.cos(a),sn=Math.sin(a),f=k*(1+.05*Math.sin(a*3+S.seed)+.035*Math.sin(a*5+S.seed*1.7)),
+     // вытянутый «каплей» эллипс: вдоль силы тяжести длиннее, сверху (у раны) — уже
+     al2=c*Lg*.55*f,ac=sn*Wd*.5*f*(c<0?.82:1),x=cx+ux*al2-uy*ac,y=cy+uy*al2+ux*ac;i?g.lineTo(x,y):g.moveTo(x,y)}
+   g.closePath();g.fillStyle='rgba('+col+','+(al*(core?1:.7)).toFixed(3)+')';g.fill()}
+  g.restore()};
+ g.save();g.beginPath();g.rect(r[0],r[1],r[2],r[3]);g.clip();if(HASFILTER)g.filter='blur(.7px)';draw(0);const span=(Lg+Wd)*pu;if(co.x-span<r[0])draw(r[2]);if(co.x+span>r[0]+r[2])draw(-r[2]);g.restore();L.dirty=true}
+function wdStains(d,dt){const L=d.cl;if(!L)return;const live=d.alive||(d.deadT||0)<90;
+ for(const w of d.wounds){if(!w.R||w.cs===null)continue;const R=REG[w.R];if(!R)continue;
+  if(w.cs===undefined){if(!wdClAt(d,R,w.pt)){w.cs=null;continue}w.cs={v:0,dv:0,n:0,seed:ri(1e9),el:0,gx:0,gy:-1};
+   // дырочка в ткани
+   const co=coAt(R,w.th,w.pt),g=L.bg;g.save();g.beginPath();g.rect(R.rect[0],R.rect[1],R.rect[2],R.rect[3]);g.clip();g.fillStyle='rgba(38,0,4,.95)';g.beginPath();g.ellipse(co.x,co.y,Math.max(1.2,.0024*co.pu),Math.max(1.2,.0024*co.pv),0,0,TAU);g.fill();g.restore();L.dirty=true}
+  const S=w.cs;if(!live)continue;
+  const I=(w.own?w.rate*Math.max(0,1-w.t/3):w.rate*d.press*(d.capK===undefined?1:d.capK))*(w.plug?.3:1);if(I>0)S.v+=I*dt*1000;
+  // сила тяжести по ткани у раны: стоит — вниз по телу, лежит — вбок, к полу
+  const gr=gravAt(d,R,w.th,w.pt),tg=Math.max(1e-3,gr.tang);S.gx+=(gr.ar/tg-S.gx)*Math.min(1,dt*2);S.gy+=(gr.al/tg-S.gy)*Math.min(1,dt*2);S.el=clamp(tg,0,1);
+  if(S.v<S.dv*1.12+.25)continue;S.dv=S.v;S.n++;
+  // площадь пятна: ~2,5 см² на мл (хлопок), не больше рубашки
+  const A=Math.min(.045,S.v*2.5e-4),gl=Math.hypot(S.gx,S.gy)||1,dir=[S.gx/gl,S.gy/gl];
+  wdStainDraw(d,R,w.th,w.pt,dir,A,S,true);
+  // пятно ушло ниже торса — продолжается на штанине
+  if(w.R==='torso'){const ext=Math.sqrt(A)*1.6*Math.abs(dir[1]),tEnd=w.pt+dir[1]*ext;if(tEnd<.96&&dir[1]<-.3){const ab=R.f(clamp(w.pt,Math.min(R.t0,R.t1),Math.max(R.t0,R.t1))),bx=R.cx+ab[0]*Math.sin(w.th),bz=R.cz+ab[1]*Math.cos(w.th),k=bx>0?'legR':'legL',LR=REG[k];
+    if(LR&&d.cl.on[k]){const thL=Math.atan2(bx-LR.cx,bz-LR.cz),A2=A*clamp((.96-tEnd)/Math.max(.02,ext),0,1)*.8;if(A2>2e-4)wdStainDraw(d,LR,thL,.95,[0,-1],A2,S,true)}}}}}
+function wdCloth(d,dt){const L=d.cl;if(!L)return;L.t-=dt;L.st-=dt;try{wdStains(d,dt)}catch(e){bugLog('stain',e)}
  // мокрое пятно расползается по ткани (впитывается), со временем — медленнее
  if(L.wet>0&&L.st<=0&&HASFILTER){L.st=.35;L.wet=Math.max(0,L.wet-.08);const g=L.bg;g.save();g.filter='blur(1.1px)';g.globalAlpha=.45;for(const k of L.rect){const r=REG[k].rect;g.drawImage(L.bc,r[0],r[1],r[2],r[3],r[0],r[1],r[2],r[3])}g.restore();if(L.wet<=0)L.rect.clear();L.dirty=true}
  if(L.dirty&&L.t<=0){L.t=.12;L.dirty=false;const g=L.cg;g.globalCompositeOperation='copy';g.drawImage(L.base,0,0);g.globalCompositeOperation='multiply';g.globalAlpha=.96;g.drawImage(L.bc,0,0);g.globalCompositeOperation='destination-in';g.globalAlpha=1;g.drawImage(L.base,0,0);g.globalCompositeOperation='source-over';L.tex.needsUpdate=true}}
